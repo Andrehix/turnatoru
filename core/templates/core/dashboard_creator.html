@@ -15,20 +15,9 @@
 <h1 class="page-title">👀 Dashboard-ul Tău</h1>
 <p class="page-subtitle">Aici vezi tot ce au turnat oamenii despre tine. Pregătește-te emoțional.</p>
 
-<div class="card" style="max-width:600px; margin:0 auto 30px auto;">
-    <h3 style="margin-bottom:15px;">📝 Creează Formular Nou</h3>
-    <form method="post" action="{% url 'core:crear_formular' %}">
-        {% csrf_token %}
-        <div class="question-card" style="margin-bottom:10px;">
-            <label for="titlu">Titlu formular</label>
-            <input type="text" id="titlu" name="titlu" placeholder="Ex: Feedback despre ședințele de luni">
-        </div>
-        <div class="question-card" style="margin-bottom:10px;">
-            <label for="mesaj">Mesaj hazliu pentru turnători</label>
-            <textarea id="mesaj" name="mesaj" rows="2" placeholder="Ex: Spune tot ce ai pe suflet, nimeni nu te judecă (sau ba)"></textarea>
-        </div>
-        <button type="submit" class="btn btn-success btn-big" style="width:100%;">Creează Formularul 🐀</button>
-    </form>
+<div style="display:flex; gap:15px; justify-content:center; margin-bottom:30px; flex-wrap:wrap;">
+    <a href="{% url 'core:crear_formular' %}" class="btn btn-success btn-big">📝 Creează Formular Nou</a>
+    <a href="{% url 'core:persoane' %}" class="btn btn-warning btn-big">👥 Gestionează Persoane</a>
 </div>
 
 <div class="card-grid">
@@ -43,6 +32,7 @@
         <p style="font-size:0.85rem; color:#666; margin-top:5px;">Creat pe {{ f.creat_la|date:"d.m.Y H:i" }}</p>
         <div style="margin-top:15px; display:flex; gap:10px; flex-wrap:wrap;">
             <a href="{% url 'core:formular_reviews' f.id %}" class="btn btn-primary">Vezi Turnătorii 🐀</a>
+            <a href="{% url 'core:export_pdf' f.id %}" class="btn btn-secondary">Exportă PDF 📄</a>
             <form method="post" action="{% url 'core:genereaza_tokeni' f.id %}" style="display:flex; gap:5px;">
                 {% csrf_token %}
                 <input type="number" name="numar_tokeni" value="5" min="1" max="50" style="width:60px; padding:8px; border:2px solid #ffa502; border-radius:8px; background:rgba(255,255,255,0.05); color:#fff; text-align:center;">

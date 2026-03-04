@@ -513,6 +513,29 @@ body {
     margin-top: 60px;
 }
 
+.camp-entry {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(233, 69, 96, 0.15);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 15px;
+    transition: all 0.3s;
+}
+
+.camp-entry:hover {
+    border-color: #e94560;
+}
+
+.camp-entry select {
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.camp-entry select option {
+    background: #1a1a2e;
+    color: #fff;
+}
+
 @media (max-width: 768px) {
     .navbar {
         flex-direction: column;

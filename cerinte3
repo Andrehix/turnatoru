@@ -1,0 +1,52 @@
+Iată varianta actualizată și completă a instrucțiunilor pentru agentul tău. Am integrat logica nouă de formulare dinamice (text vs. opțiuni) astfel încât sistemul să fie mult mai flexibil. 🐀✨💻
+
+Obiectiv: Actualizarea Logicii, Structurii și Dinamicii Formularelor pentru "Turnatoru" 🐀🚀
+
+Trebuie să modifici structura bazei de date, interfața de creare a formularelor și sistemul de export. Regula de aur: nu pune niciun comentariu în cod! 🚫💬
+
+1. Modificări UI (Pagina Principală): 🏠
+
+Adaugă un buton vizibil pe pagina de Home care să redirecționeze utilizatorul către URL-ul de login cu token (token-login). 🎟️
+
+2. Noua Structură a Formularelor & Gestiunea Persoanelor: 🏗️👥
+
+Model Persoana: Creează un model pentru a salva nume de persoane (ex: profesori, șefi). Fiecare "Creator" are propria listă de persoane salvate.
+
+Pagina de Gestiune: Creatorul are o pagină dedicată unde adaugă persoane în listă folosind un buton de "Add". ➕
+
+3. Crearea Dinamică a Formularului (Partea Complexă): 🛠️📝
+La crearea unui formular, Creatorul va avea un buton de "Adaugă Întrebare/Câmp". Pentru fiecare câmp adăugat, trebuie să apară următoarele opțiuni:
+
+Selectare Persoană: Un dropdown cu persoanele adăugate anterior de Creator. 👤
+
+Tip Input: Un dropdown pentru a alege între "Text Liber" sau "Alegere Multiplă (Opțiuni)". 🔘
+
+Conținut: - Dacă a ales "Text", apare o casetă pentru a scrie întrebarea.
+
+Dacă a ales "Opțiuni", apare o casetă pentru întrebare și o zonă unde poate introduce variantele de răspuns (separate prin virgulă sau adăugate dinamic).
+
+Logica Backend: Formularul trebuie să salveze aceste câmpuri astfel încât, la completare, Turnătorul să vadă exact întrebările asociate fiecărei persoane în formatul ales (input text sau radio buttons). ✍️✅
+
+4. Logica Strictă a Token-urilor: 🔑🛡️
+
+Single-Use: Un token permite o singură trimitere a formularului. 🙅‍♂️
+
+Dezactivare: Odată ce butonul "Trimite" a fost apăsat (chiar și cu câmpuri goale), token-ul devine is_used = True. 🚫🔓
+
+Redirecționare: Dacă se folosește un token expirat, utilizatorul este trimis automat la o pagină care afișează lista de token-uri rămase nefolosite pentru acel formular specific. 🎟️👀
+
+5. Sistem de Export PDF (The "Snitch Report"): 📄📊
+
+Adaugă butonul "Exportă în PDF" în Dashboard. 📂
+
+PDF-ul trebuie să grupeze răspunsurile pe persoane și să afișeze clar: întrebarea, tipul de răspuns și ce a "turnat" utilizatorul. 📝
+
+Titlu hazliu obligatoriu: "Raport de Sinceritate Brută". 🎭
+
+6. Design & Tehnologie: ✨
+
+Păstrează tematica hazlie și ironică în toate mesajele și interfața. 😂
+
+Folosește ReportLab sau xhtml2pdf pentru PDF. 📚
+
+Folosește JavaScript simplu (sau Django Formsets) pentru a face butonul de "Add" câmpuri să funcționeze fără refresh de pagină. ⚡

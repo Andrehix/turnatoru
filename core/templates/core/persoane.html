@@ -1,0 +1,48 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Turnatoru🐀 — Persoane{% endblock %}
+
+{% block navbar_right %}
+<span class="nav-text">Salut, <strong style="color:#e94560;">{{ user.username }}</strong> 👋</span>
+<a href="{% url 'core:dashboard_creator' %}" class="btn btn-secondary">← Dashboard</a>
+<a href="{% url 'core:logout' %}" class="btn btn-secondary">Logout 🚪</a>
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title">👥 Lista Ta de Subiecți</h1>
+<p class="page-subtitle">Adaugă persoanele despre care vrei să primești feedback. Profesori, șefi, colegi... oricine merită "evaluat".</p>
+
+<div class="card" style="max-width:600px; margin:0 auto 30px auto;">
+    <h3 style="margin-bottom:15px;">➕ Adaugă Persoană Nouă</h3>
+    <form method="post" style="display:flex; gap:10px; align-items:center;">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add">
+        <input type="text" name="nume" placeholder="Nume complet (ex: Prof. Ionescu)" style="flex:1; padding:12px 16px; border:2px solid rgba(233,69,96,0.3); border-radius:10px; background:rgba(255,255,255,0.03); color:#fff; font-size:1rem;">
+        <button type="submit" class="btn btn-success">Adaugă ➕</button>
+    </form>
+</div>
+
+<div style="max-width:600px; margin:0 auto;">
+    {% if persoane %}
+    <div class="card">
+        <h3 style="margin-bottom:15px;">📋 Persoane Salvate ({{ persoane|length }})</h3>
+        {% for p in persoane %}
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:rgba(255,255,255,0.03); border-radius:10px; margin-bottom:8px; border:1px solid rgba(233,69,96,0.1);">
+            <span style="color:#ddd; font-size:1.05rem;">👤 {{ p.nume }}</span>
+            <form method="post" style="margin:0;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="persoana_id" value="{{ p.id }}">
+                <button type="submit" class="btn btn-secondary" style="padding:5px 12px; font-size:0.8rem;" onclick="return confirm('Sigur vrei să ștergi această persoană?')">🗑️</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card" style="text-align:center; padding:50px;">
+        <h3>🤷 Nicio persoană adăugată</h3>
+        <p style="margin-top:10px;">Adaugă persoane ca să le poți asocia întrebări în formulare.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

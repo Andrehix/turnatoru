@@ -1,0 +1,37 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Turnatoru🐀 — Token Expirat{% endblock %}
+
+{% block navbar_right %}
+<span class="nav-text">🚫 Token folosit</span>
+{% endblock %}
+
+{% block content %}
+<div class="token-login-box">
+    <h1>🚫 Token Expirat!</h1>
+    <p style="font-size:1.2rem; color:#e94560; margin-bottom:20px;">Acest token a fost deja folosit. Un turnător nu toarnă de două ori cu același bilet!</p>
+
+    <div style="padding:25px; background:rgba(255,255,255,0.03); border-radius:12px; margin-bottom:30px;">
+        <p style="color:#888; font-size:1rem;">Formular: <strong style="color:#ffa502;">{{ formular.titlu }}</strong></p>
+    </div>
+
+    {% if tokeni_ramasi %}
+    <div class="card" style="text-align:left; margin-bottom:30px;">
+        <h3 style="margin-bottom:15px;">🎫 Tokeni Disponibili ({{ tokeni_ramasi|length }})</h3>
+        <p style="color:#888; margin-bottom:15px; font-size:0.9rem;">Iată lista cu tokeni nefolosiți pentru acest formular. Ia-ți unul și toarnă!</p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+            {% for t in tokeni_ramasi %}
+            <span style="padding:6px 14px; background:rgba(46,213,115,0.1); border:1px solid #2ed573; border-radius:8px; font-family:monospace; font-weight:700; color:#2ed573;">{{ t.cod }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="card" style="padding:30px; margin-bottom:30px;">
+        <h3>😱 Nu mai sunt tokeni disponibili!</h3>
+        <p style="margin-top:10px; color:#888;">Toți tokenii pentru acest formular au fost folosiți. Runda de turnătorii s-a încheiat.</p>
+    </div>
+    {% endif %}
+
+    <a href="{% url 'core:token_login' %}" class="btn btn-primary btn-big">← Încearcă alt token</a>
+</div>
+{% endblock %}

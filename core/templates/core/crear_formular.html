@@ -1,0 +1,139 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Turnatoru🐀 — Creează Formular{% endblock %}
+
+{% block navbar_right %}
+<span class="nav-text">Salut, <strong style="color:#e94560;">{{ user.username }}</strong> 👋</span>
+<a href="{% url 'core:dashboard_creator' %}" class="btn btn-secondary">← Dashboard</a>
+<a href="{% url 'core:logout' %}" class="btn btn-secondary">Logout 🚪</a>
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title">🛠️ Creează Formular Nou</h1>
+<p class="page-subtitle">Construiește formularul perfect pentru a afla adevăruri pe care nu le-ai cerut.</p>
+
+{% if not persoane %}
+<div class="card" style="max-width:600px; margin:0 auto; text-align:center; padding:40px;">
+    <h3>⚠️ Nu ai nicio persoană adăugată!</h3>
+    <p style="margin-top:10px; margin-bottom:20px;">Mai întâi adaugă persoane în lista ta, apoi revino aici să creezi formularul.</p>
+    <a href="{% url 'core:persoane' %}" class="btn btn-warning btn-big">Adaugă Persoane 👥</a>
+</div>
+{% else %}
+<div style="max-width:800px; margin:0 auto;">
+    <form method="post" id="formularForm">
+        {% csrf_token %}
+        <div class="card" style="margin-bottom:20px;">
+            <div class="question-card" style="margin-bottom:10px;">
+                <label for="titlu">Titlu formular</label>
+                <input type="text" id="titlu" name="titlu" placeholder="Ex: Feedback despre profesorii de la facultate" required>
+            </div>
+            <div class="question-card" style="margin-bottom:10px;">
+                <label for="mesaj">Mesaj hazliu pentru turnători</label>
+                <textarea id="mesaj" name="mesaj" rows="2" placeholder="Ex: Spune tot ce ai pe suflet, nimeni nu te judecă (sau ba)"></textarea>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom:20px;">
+            <h3 style="margin-bottom:15px;">📝 Întrebări / Câmpuri</h3>
+            <p style="color:#888; margin-bottom:20px; font-size:0.9rem;">Adaugă întrebări și asociază-le cu persoane. Poți alege între text liber și opțiuni multiple.</p>
+
+            <div id="campuri-container"></div>
+
+            <button type="button" id="addCampBtn" class="btn btn-warning" style="width:100%; margin-top:15px;">
+                ➕ Adaugă Întrebare / Câmp
+            </button>
+        </div>
+
+        <input type="hidden" name="campuri_json" id="campuri_json" value="[]">
+        <button type="submit" class="btn btn-success btn-big" style="width:100%;">Creează Formularul 🐀</button>
+    </form>
+</div>
+
+<script>
+var persoane = [
+    {% for p in persoane %}
+    {id: {{ p.id }}, nume: "{{ p.nume|escapejs }}"}{% if not forloop.last %},{% endif %}
+    {% endfor %}
+];
+var campIndex = 0;
+
+function createCamp() {
+    campIndex++;
+    var div = document.createElement('div');
+    div.className = 'camp-entry';
+    div.id = 'camp-' + campIndex;
+    div.setAttribute('data-index', campIndex);
+
+    var persoaneOptions = '<option value="">-- Alege persoana --</option>';
+    for (var i = 0; i < persoane.length; i++) {
+        persoaneOptions += '<option value="' + persoane[i].id + '">' + persoane[i].nume + '</option>';
+    }
+
+    div.innerHTML =
+        '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">' +
+            '<span style="color:#ffa502; font-weight:700;">Întrebare #' + campIndex + '</span>' +
+            '<button type="button" class="btn btn-secondary" style="padding:4px 10px; font-size:0.8rem;" onclick="removeCamp(' + campIndex + ')">🗑️ Șterge</button>' +
+        '</div>' +
+        '<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">' +
+            '<div>' +
+                '<label style="display:block; color:#e94560; font-weight:600; margin-bottom:6px; font-size:0.9rem;">👤 Persoana</label>' +
+                '<select class="camp-persoana" style="width:100%; padding:10px; border:2px solid rgba(233,69,96,0.3); border-radius:10px; background:rgba(255,255,255,0.03); color:#fff; font-size:0.95rem;">' +
+                    persoaneOptions +
+                '</select>' +
+            '</div>' +
+            '<div>' +
+                '<label style="display:block; color:#e94560; font-weight:600; margin-bottom:6px; font-size:0.9rem;">🔘 Tip răspuns</label>' +
+                '<select class="camp-tip" onchange="toggleOptiuni(this, ' + campIndex + ')" style="width:100%; padding:10px; border:2px solid rgba(233,69,96,0.3); border-radius:10px; background:rgba(255,255,255,0.03); color:#fff; font-size:0.95rem;">' +
+                    '<option value="text">Text Liber</option>' +
+                    '<option value="optiuni">Alegere Multiplă</option>' +
+                '</select>' +
+            '</div>' +
+        '</div>' +
+        '<div style="margin-bottom:10px;">' +
+            '<label style="display:block; color:#e94560; font-weight:600; margin-bottom:6px; font-size:0.9rem;">❓ Întrebarea</label>' +
+            '<input type="text" class="camp-intrebare" placeholder="Ex: Cum evaluezi calitatea cursului?" style="width:100%; padding:10px; border:2px solid rgba(233,69,96,0.3); border-radius:10px; background:rgba(255,255,255,0.03); color:#fff; font-size:0.95rem;">' +
+        '</div>' +
+        '<div class="camp-optiuni-container" id="optiuni-container-' + campIndex + '" style="display:none; margin-bottom:10px;">' +
+            '<label style="display:block; color:#e94560; font-weight:600; margin-bottom:6px; font-size:0.9rem;">📋 Opțiuni (separate prin virgulă)</label>' +
+            '<input type="text" class="camp-optiuni" placeholder="Ex: Excelent, Bun, Mediocru, Slab" style="width:100%; padding:10px; border:2px solid rgba(255,165,2,0.3); border-radius:10px; background:rgba(255,255,255,0.03); color:#fff; font-size:0.95rem;">' +
+        '</div>';
+
+    document.getElementById('campuri-container').appendChild(div);
+}
+
+function removeCamp(index) {
+    var el = document.getElementById('camp-' + index);
+    if (el) el.remove();
+}
+
+function toggleOptiuni(select, index) {
+    var container = document.getElementById('optiuni-container-' + index);
+    container.style.display = select.value === 'optiuni' ? 'block' : 'none';
+}
+
+document.getElementById('addCampBtn').addEventListener('click', function() {
+    createCamp();
+});
+
+document.getElementById('formularForm').addEventListener('submit', function(e) {
+    var entries = document.querySelectorAll('.camp-entry');
+    var campuri = [];
+    entries.forEach(function(entry) {
+        var persoanaId = entry.querySelector('.camp-persoana').value;
+        var tip = entry.querySelector('.camp-tip').value;
+        var intrebare = entry.querySelector('.camp-intrebare').value;
+        var optiuni = entry.querySelector('.camp-optiuni') ? entry.querySelector('.camp-optiuni').value : '';
+        if (persoanaId && intrebare) {
+            campuri.push({
+                persoana_id: parseInt(persoanaId),
+                tip: tip,
+                intrebare: intrebare,
+                optiuni: optiuni
+            });
+        }
+    });
+    document.getElementById('campuri_json').value = JSON.stringify(campuri);
+});
+</script>
+{% endif %}
+{% endblock %}

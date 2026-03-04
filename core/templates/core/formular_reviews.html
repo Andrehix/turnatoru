@@ -5,6 +5,7 @@
 {% block navbar_right %}
 <span class="nav-text">Salut, <strong style="color:#e94560;">{{ user.username }}</strong> 👋</span>
 <a href="{% url 'core:dashboard_creator' %}" class="btn btn-secondary">← Înapoi</a>
+<a href="{% url 'core:export_pdf' formular.id %}" class="btn btn-warning">Exportă PDF 📄</a>
 <a href="{% url 'core:logout' %}" class="btn btn-secondary">Logout 🚪</a>
 {% endblock %}
 
@@ -26,15 +27,32 @@
     </div>
     {% endif %}
 
+    {% if campuri %}
+    <div class="card" style="margin-bottom:30px;">
+        <h3 style="margin-bottom:10px;">📋 Structura Formularului</h3>
+        {% for camp in campuri %}
+        <div style="padding:8px 12px; background:rgba(255,255,255,0.03); border-radius:8px; margin-bottom:6px; border-left:3px solid {% if camp.tip == 'text' %}#2ed573{% else %}#ffa502{% endif %};">
+            <span style="color:#ddd;">👤 {{ camp.persoana.nume }} — {{ camp.intrebare }}</span>
+            <span class="badge {% if camp.tip == 'text' %}badge-success{% else %}badge-warning{% endif %}" style="margin-left:8px;">{{ camp.get_tip_display }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     <h3 style="color:#e94560; margin-bottom:15px;">📝 Turnătorii Primite ({{ reviews|length }})</h3>
 
     {% for r in reviews %}
     <div class="review-card">
         <div class="review-meta">
             <span class="review-token">🐀 Turnătorie anonimă</span>
-            <span>{{ r.creat_la|date:"d.m.Y H:i" }}</span>
+            <span>{{ r.turnatorie.creat_la|date:"d.m.Y H:i" }}</span>
         </div>
-        <p class="review-text">{{ r.text }}</p>
+        {% for raspuns in r.raspunsuri %}
+        <div style="padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+            <span style="color:#ffa502; font-size:0.85rem;">👤 {{ raspuns.camp.persoana.nume }} — {{ raspuns.camp.intrebare }}</span>
+            <p class="review-text" style="margin-top:4px;">{% if raspuns.valoare %}{{ raspuns.valoare }}{% else %}<em style="color:#666;">(fără răspuns)</em>{% endif %}</p>
+        </div>
+        {% endfor %}
     </div>
     {% endfor %}
 

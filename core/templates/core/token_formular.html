@@ -13,10 +13,31 @@
 
     <form method="post">
         {% csrf_token %}
-        <div class="question-card">
-            <label>Scrie-ți turnătoria aici 🐀</label>
-            <textarea name="feedback" rows="6" placeholder="Spune tot ce ai pe suflet. Nimeni nu va ști cine ești. Promitem. Probabil."></textarea>
+
+        {% for persoana, campuri in persoane_campuri.items %}
+        <div class="card" style="margin-bottom:20px;">
+            <h3 style="margin-bottom:15px;">👤 {{ persoana.nume }}</h3>
+
+            {% for camp in campuri %}
+            <div class="question-card" style="margin-bottom:15px;">
+                <label>{{ camp.intrebare }}</label>
+
+                {% if camp.tip == 'text' %}
+                <textarea name="camp_{{ camp.id }}" rows="3" placeholder="Scrie-ți părerea sinceră aici..."></textarea>
+                {% elif camp.tip == 'optiuni' %}
+                <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
+                    {% for optiune in camp.get_optiuni_list %}
+                    <label style="display:flex; align-items:center; gap:10px; cursor:pointer; padding:10px 14px; background:rgba(255,255,255,0.03); border:1px solid rgba(233,69,96,0.15); border-radius:10px; color:#ddd; font-weight:400; font-size:1rem;">
+                        <input type="radio" name="camp_{{ camp.id }}" value="{{ optiune }}" style="accent-color:#e94560;">
+                        {{ optiune }}
+                    </label>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
         </div>
+        {% endfor %}
 
         <div style="text-align:center; margin-top:30px;">
             <button type="submit" class="btn btn-success btn-big">Trimite Turnatură 🐀</button>
