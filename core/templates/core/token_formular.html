@@ -1,0 +1,33 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Turnatoru🐀 — Formular Anonim{% endblock %}
+
+{% block navbar_right %}
+<span class="nav-text">🎫 Token activ: <strong style="color:#ffa502; font-family:monospace;">{{ token }}</strong></span>
+{% endblock %}
+
+{% block content %}
+<div class="form-section">
+    <h1>📝 {{ formular.titlu }}</h1>
+    <p class="form-desc">{{ formular.mesaj }}</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="question-card">
+            <label>Scrie-ți turnătoria aici 🐀</label>
+            <textarea name="feedback" rows="6" placeholder="Spune tot ce ai pe suflet. Nimeni nu va ști cine ești. Promitem. Probabil."></textarea>
+        </div>
+
+        <div style="text-align:center; margin-top:30px;">
+            <button type="submit" class="btn btn-success btn-big">Trimite Turnatură 🐀</button>
+        </div>
+    </form>
+
+    <div style="text-align:center; margin-top:30px; padding:15px; background:rgba(46,213,115,0.05); border-radius:12px;">
+        <p style="color:#888; font-size:0.85rem;">
+            🛡️ Răspunsul tău este complet anonim. Nici noi nu știm cine ești. Nici nu ne interesează.
+            Ne interesează doar <em>adevărul</em>. Și poate un pic de dramă.
+        </p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Turnatoru🐀 — Turnătorie Trimisă!{% endblock %}
+
+{% block navbar_right %}
+<span class="nav-text">🐀 Misiune completă</span>
+{% endblock %}
+
+{% block content %}
+<div class="token-login-box">
+    <h1>🎉 Gata, ai turnat!</h1>
+    <p style="font-size:1.2rem; color:#2ed573; margin-bottom:20px;">Turnătoria ta pentru "{{ formular.titlu }}" a fost salvată cu succes!</p>
+    <p style="color:#aaa; margin-bottom:30px;">
+        Nimeni nu va ști vreodată că tu ai scris asta. Poți dormi liniștit. Sau neliniștit, depinde ce ai scris.
+    </p>
+    <div style="padding:25px; background:rgba(255,255,255,0.03); border-radius:12px; margin-bottom:30px;">
+        <p style="color:#888; font-size:1.1rem;">🐀 "Un turnător bun este un turnător anonim."</p>
+        <p style="color:#555; font-size:0.85rem; margin-top:5px;">— Nimeni, niciodată</p>
+    </div>
+    <a href="{% url 'core:home' %}" class="btn btn-primary btn-big">Înapoi la Pagina Principală 🏠</a>
+</div>
+{% endblock %}

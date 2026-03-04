@@ -1,0 +1,62 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Turnatoru🐀 — Dashboard Creator{% endblock %}
+
+{% block navbar_right %}
+<span class="nav-text">Salut, <strong style="color:#e94560;">{{ user.username }}</strong> 👋</span>
+<a href="{% url 'core:dashboard_creator' %}" class="btn btn-secondary">Dashboard 📊</a>
+{% if user.is_staff %}
+<a href="{% url 'core:dashboard_admin' %}" class="btn btn-warning">Admin 🕵️</a>
+{% endif %}
+<a href="{% url 'core:logout' %}" class="btn btn-secondary">Logout 🚪</a>
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title">👀 Dashboard-ul Tău</h1>
+<p class="page-subtitle">Aici vezi tot ce au turnat oamenii despre tine. Pregătește-te emoțional.</p>
+
+<div class="card" style="max-width:600px; margin:0 auto 30px auto;">
+    <h3 style="margin-bottom:15px;">📝 Creează Formular Nou</h3>
+    <form method="post" action="{% url 'core:crear_formular' %}">
+        {% csrf_token %}
+        <div class="question-card" style="margin-bottom:10px;">
+            <label for="titlu">Titlu formular</label>
+            <input type="text" id="titlu" name="titlu" placeholder="Ex: Feedback despre ședințele de luni">
+        </div>
+        <div class="question-card" style="margin-bottom:10px;">
+            <label for="mesaj">Mesaj hazliu pentru turnători</label>
+            <textarea id="mesaj" name="mesaj" rows="2" placeholder="Ex: Spune tot ce ai pe suflet, nimeni nu te judecă (sau ba)"></textarea>
+        </div>
+        <button type="submit" class="btn btn-success btn-big" style="width:100%;">Creează Formularul 🐀</button>
+    </form>
+</div>
+
+<div class="card-grid">
+    {% for f in formulare %}
+    <div class="card">
+        <div class="card-header">
+            <h3>{{ f.titlu }}</h3>
+            <span class="badge badge-success">Activ</span>
+        </div>
+        <p>📊 <strong>{{ f.raspunsuri }}</strong> turnătorii primite</p>
+        <p>🎫 <strong>{{ f.tokeni_count }}</strong> tokeni generați</p>
+        <p style="font-size:0.85rem; color:#666; margin-top:5px;">Creat pe {{ f.creat_la|date:"d.m.Y H:i" }}</p>
+        <div style="margin-top:15px; display:flex; gap:10px; flex-wrap:wrap;">
+            <a href="{% url 'core:formular_reviews' f.id %}" class="btn btn-primary">Vezi Turnătorii 🐀</a>
+            <form method="post" action="{% url 'core:genereaza_tokeni' f.id %}" style="display:flex; gap:5px;">
+                {% csrf_token %}
+                <input type="number" name="numar_tokeni" value="5" min="1" max="50" style="width:60px; padding:8px; border:2px solid #ffa502; border-radius:8px; background:rgba(255,255,255,0.05); color:#fff; text-align:center;">
+                <button type="submit" class="btn btn-warning">Generează Tokeni 🎫</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if not formulare %}
+<div class="card" style="text-align:center; padding:60px;">
+    <h3>🦗 Aici e gol ca într-un birou luni la 8 dimineața</h3>
+    <p style="margin-top:10px;">Creează primul tău formular și începe să primești adevăruri pe care nu le-ai cerut!</p>
+</div>
+{% endif %}
+{% endblock %}

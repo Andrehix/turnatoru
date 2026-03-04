@@ -1,0 +1,48 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Turnatoru🐀 — Răspunsuri: {{ formular.titlu }}{% endblock %}
+
+{% block navbar_right %}
+<span class="nav-text">Salut, <strong style="color:#e94560;">{{ user.username }}</strong> 👋</span>
+<a href="{% url 'core:dashboard_creator' %}" class="btn btn-secondary">← Înapoi</a>
+<a href="{% url 'core:logout' %}" class="btn btn-secondary">Logout 🚪</a>
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title">🐀 Turnătorii: {{ formular.titlu }}</h1>
+<p class="page-subtitle">{{ formular.mesaj }}</p>
+
+<div style="max-width:700px; margin:0 auto;">
+
+    {% if tokeni %}
+    <div class="card" style="margin-bottom:30px;">
+        <h3 style="margin-bottom:10px;">🎫 Tokeni Generați ({{ tokeni|length }})</h3>
+        <p style="color:#888; margin-bottom:15px; font-size:0.9rem;">Copiază-i și dă-i la turnători. Fiecare token = un răspuns anonim.</p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+            {% for t in tokeni %}
+            <span style="padding:6px 14px; background:rgba(255,165,2,0.1); border:1px solid #ffa502; border-radius:8px; font-family:monospace; font-weight:700; color:{% if t.folosit %}#666{% else %}#ffa502{% endif %}; {% if t.folosit %}text-decoration:line-through;{% endif %}">{{ t.cod }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <h3 style="color:#e94560; margin-bottom:15px;">📝 Turnătorii Primite ({{ reviews|length }})</h3>
+
+    {% for r in reviews %}
+    <div class="review-card">
+        <div class="review-meta">
+            <span class="review-token">🐀 Turnătorie anonimă</span>
+            <span>{{ r.creat_la|date:"d.m.Y H:i" }}</span>
+        </div>
+        <p class="review-text">{{ r.text }}</p>
+    </div>
+    {% endfor %}
+
+    {% if not reviews %}
+    <div class="card" style="text-align:center; padding:50px;">
+        <h3>🤐 Nimeni n-a turnat încă</h3>
+        <p style="margin-top:10px;">Fie oamenii tăi sunt prea fericiți, fie nu știu de formular. Bănuiesc varianta a doua.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Turnatoru🐀{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'core/style.css' %}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{% url 'core:home' %}" class="navbar-brand">🐀 TURNATORU</a>
+        <div class="navbar-right">
+            {% block navbar_right %}
+            {% if user.is_authenticated %}
+            <span class="nav-text">Salut, <strong style="color:#e94560;">{{ user.username }}</strong> 👋</span>
+            <a href="{% url 'core:dashboard_creator' %}" class="btn btn-secondary">Dashboard 📊</a>
+            {% if user.is_staff %}
+            <a href="{% url 'core:dashboard_admin' %}" class="btn btn-warning">Admin 🕵️</a>
+            {% endif %}
+            <a href="{% url 'core:logout' %}" class="btn btn-secondary">Logout 🚪</a>
+            {% else %}
+            <form method="post" action="{% url 'core:login' %}" style="display:flex; align-items:center; gap:10px;">
+                {% csrf_token %}
+                <input type="text" name="username" class="nav-input" placeholder="Utilizator">
+                <input type="password" name="password" class="nav-input" placeholder="Parolă">
+                <button type="submit" class="btn btn-primary">Login 🔑</button>
+            </form>
+            <span class="nav-text">Nu ai cont?</span>
+            <a href="{% url 'core:register' %}" class="btn btn-secondary">Înregistrare 🚪</a>
+            {% endif %}
+            {% endblock %}
+        </div>
+    </nav>
+
+    <div class="container">
+        {% if messages %}
+        <div style="max-width:700px; margin:15px auto;">
+            {% for message in messages %}
+            <div class="card" style="padding:15px 25px; margin-bottom:10px; border-left:4px solid {% if message.tags == 'error' %}#e94560{% elif message.tags == 'success' %}#2ed573{% else %}#ffa502{% endif %};">
+                <p style="color:#ddd;">{{ message }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="footer">
+        🐀 Turnatoru &copy; 2026 — Unde anonimitatea e o artă și feedback-ul e o armă. Folosește responsabil (sau nu).
+    </footer>
+</body>
+</html>

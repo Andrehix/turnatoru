@@ -1,0 +1,33 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Turnatoru🐀 — Înregistrare{% endblock %}
+
+{% block content %}
+<div class="register-box">
+    <h1>🚪 Înregistrare</h1>
+    <p class="register-subtitle">Vrei să afli ce cred oamenii despre tine? Ești sigur? Bine, las' că nu mai ai scăpare...</p>
+
+    <form method="post" class="register-form">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="username">Nume de utilizator</label>
+            <input type="text" id="username" name="username" placeholder="turnatoru_suprem_69">
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="soricel@turnatoru.ro">
+        </div>
+        <div class="form-group">
+            <label for="password1">Parolă</label>
+            <input type="password" id="password1" name="password1" placeholder="Ceva mai bun decât 1234, te rog">
+        </div>
+        <div class="form-group">
+            <label for="password2">Confirmă parola</label>
+            <input type="password" id="password2" name="password2" placeholder="Aceeași chestie ca mai sus, dai?">
+        </div>
+        <button type="submit" class="btn btn-primary btn-big" style="width:100%; margin-top:10px;">Creează Cont 🐀</button>
+    </form>
+
+    <p style="margin-top:20px; color:#888;">Ai deja cont? <a href="{% url 'core:home' %}" style="color:#e94560;">Du-te la login →</a></p>
+</div>
+{% endblock %}

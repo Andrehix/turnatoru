@@ -1,0 +1,64 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Turnatoru🐀 — Admin Dashboard{% endblock %}
+
+{% block navbar_right %}
+<span class="nav-text">🕵️ <strong style="color:#e94560;">ADMIN: {{ user.username }}</strong></span>
+<a href="{% url 'core:dashboard_creator' %}" class="btn btn-secondary">Dashboard 📊</a>
+<a href="{% url 'core:logout' %}" class="btn btn-secondary">Logout 🚪</a>
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title">🕵️‍♂️ Panoul Administratorului</h1>
+<p class="page-subtitle">Aici vezi totul. Ești Big Brother, dar mai simpatic și cu emoji-uri.</p>
+
+<div style="display:flex; gap:20px; justify-content:center; margin-bottom:40px; flex-wrap:wrap;">
+    <div class="card" style="text-align:center; min-width:180px;">
+        <div class="stat-number">{{ formulare|length }}</div>
+        <p>Formulare Totale</p>
+    </div>
+    <div class="card" style="text-align:center; min-width:180px;">
+        <div class="stat-number" style="color:#2ed573;">{{ tokeni_total }}</div>
+        <p>Tokeni Activi</p>
+    </div>
+    <div class="card" style="text-align:center; min-width:180px;">
+        <div class="stat-number" style="color:#ffa502;">{{ turnatorii_total }}</div>
+        <p>Turnătorii Totale</p>
+    </div>
+</div>
+
+<div class="card" style="overflow-x:auto;">
+    <h3 style="margin-bottom:15px;">📋 Toate Formularele</h3>
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Creator</th>
+                <th>Titlu Formular</th>
+                <th>Tokeni</th>
+                <th>Turnătorii</th>
+                <th>Creat la</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for f in formulare %}
+            <tr>
+                <td>{{ f.id }}</td>
+                <td><strong>{{ f.creator.username }}</strong></td>
+                <td>{{ f.titlu }}</td>
+                <td>🎫 {{ f.tokeni.count }}</td>
+                <td>🐀 {{ f.turnatorii.count }}</td>
+                <td>{{ f.creat_la|date:"d.m.Y H:i" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if not formulare %}
+<div class="card" style="text-align:center; padding:50px;">
+    <h3>🏜️ Nicio cerere. Liniște totală.</h3>
+    <p style="margin-top:10px;">Nimeni nu a vrut încă feedback. Fie toți sunt fericiți, fie nu știu de existența ta.</p>
+</div>
+{% endif %}
+{% endblock %}

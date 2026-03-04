@@ -1,0 +1,25 @@
+Context Backend: ⚙️
+Continuăm proiectul Django "turnatoru". 🐀 Baza de date este SQLite. 🗄️ Acum trebuie să implementezi logica de backend, modelele și funcționalitatea. 🧠 Regula de aur: nu pune absolut niciun comentariu în codul generat! 🚫💬
+
+Modele de date (models.py): 📊
+
+Formular: Titlu, mesaj hazliu, creator (Foreign Key la User-ul Django). 📝
+
+TokenTurnator: Un cod unic (string) generat automat, legat de un Formular (Foreign Key). 🔑
+
+Turnatorie (Feedback): Textul lăsat de utilizator, legat de Formular (Foreign Key). 🗣️
+
+Logica și Funcționalitatea (views.py): ⚙️
+
+Conturi: Login și Înregistrare pe bune pentru Creatori. 🔐
+
+Dashboard Creator: Aici creatorul face un Formular nou, apasă un buton să genereze Tokenuri pentru el și citește "turnătoriile" primite. 📈
+
+Acces Token: Pagina unde se bagă DOAR tokenul. 🚪 Dacă tokenul există în baza de date, îi afișezi formularul aferent. ✅
+
+Salvare: Când omul cu token trimite formularul, salvează datele anonim în baza de date. 💾
+
+Panoul Admin: 👑
+Înregistrează toate modelele în admin.py. 👁️ Adminul trebuie să poată vedea și șterge orice formular, token sau turnătorie. 🧹
+
+Păstrează tonul mega hazliu la orice mesaj de eroare sau succes! 😂

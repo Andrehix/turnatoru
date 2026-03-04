@@ -1,0 +1,33 @@
+Context:
+Te afli într-un folder unde există deja un proiect Django "chel" (abia inițializat) cu numele turnatoru. Baza de date folosită este SQLite (cea implicită).
+
+Obiectivul tău:
+Trebuie să creezi "fațada" (paginile HTML, CSS, rutele din urls.py și funcțiile simple din views.py) pentru o platformă web numită "Turnatoru🐀". Platforma este destinată creării de formulare anonime de feedback (ex: un director vede opinia elevilor, un șef vede opinia angajaților, prieteni care fac o activitate amuzantă).
+
+Proiectul trebuie lăsat neterminat pe partea de logică backend! Mă interesează strict frontend-ul și rutele, logica de salvare/procesare va fi dezvoltată mai încolo. Totul trebuie să aibă un design și un ton general foarte hazliu și amuzant. 😂 Nu pune comentarii în codul generat.
+
+Structura utilizatorilor (pentru care trebuie făcute pagini/interfețe):
+
+Adminul: O pagină de administrare unde poate vedea toate cererile, formularele și tokenurile aferente. 🕵️‍♂️
+
+Creatorul: O pagină (dashboard) unde poate intra pe formularul lui și poate vedea review-urile lăsate de oameni (identificați doar prin tokenuri). 👀
+
+Turnătorul (omul cu token): O pagină de login separată unde se introduce doar un token. După "logare", acesta poate accesa exclusiv formularul aferent acelui token pentru a lăsa feedback anonim. 📝
+
+Cerințe specifice pentru Prima Pagină (Home):
+
+În partea dreapta-sus trebuie să existe: o casetă pentru utilizator, o casetă pentru parolă și un buton de "Login". 🔑
+
+Lângă acestea, adaugă textul "Nu ai cont?" urmat de un buton de "Înregistrare". 🚪
+
+Pe centrul paginii trebuie să apară descrierea proiectului și motivarea creării acestuia, folosind un limbaj extrem de hazliu, ironic și amuzant. 🎭
+
+Ce trebuie să generezi:
+
+Aplicația de bază Django (dacă e nevoie, sugerează comanda de startapp).
+
+Fișierele urls.py și views.py cu rutele pentru: Home, Dashboard Creator, Login Token, Formular Token, Dashboard Admin.
+
+Fișierele HTML corespunzătoare acestor rute (folosește HTML/CSS sau un framework simplu ca Bootstrap/Tailwind pentru un aspect decent, dar amuzant). 🎨
+
+Vrei să îi mai specificăm agentului ce culori să folosească pentru tema site-ului? 🎨✨

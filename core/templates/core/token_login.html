@@ -1,0 +1,27 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Turnatoru🐀 — Login cu Token{% endblock %}
+
+{% block content %}
+<div class="token-login-box">
+    <h1>🎫 Login Turnător</h1>
+    <p>Ai primit un token secret? Introdu-l mai jos și pregătește-te să torni tot ce ai pe suflet. Anonim, desigur.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="token" class="token-input" placeholder="INTRODU TOKENUL" maxlength="20" autocomplete="off">
+        <button type="submit" class="btn btn-primary btn-big" style="width:100%;">Intră în formular 🐀</button>
+    </form>
+
+    <p style="margin-top:30px; color:#666; font-size:0.9rem;">
+        🔒 Tokenul tău nu va fi asociat cu identitatea ta. Ești mai anonim decât un cont de trolling pe Reddit.
+    </p>
+
+    <div style="margin-top:40px; padding:20px; background:rgba(255,255,255,0.03); border-radius:12px;">
+        <p style="color:#888; font-size:0.9rem;">
+            <strong style="color:#ffa502;">⚠️ Atenție:</strong> Dacă n-ai primit un token, înseamnă că nimeni nu vrea
+            opinia ta. Glumesc. Sau nu. Întreabă-l pe cel care a creat formularul.
+        </p>
+    </div>
+</div>
+{% endblock %}
