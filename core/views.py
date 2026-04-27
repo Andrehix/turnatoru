@@ -185,13 +185,13 @@ def genereaza_tokeni(request, formular_id):
 @login_required(login_url='/')
 def dashboard_creator_formular(request, formular_id):
     formular = get_object_or_404(Formular, id=formular_id, creator=request.user)
-    reviews = formular.turnatorii.all().order_by('-creat_la')
+    reviews = formular.turnatorii.select_related('sentiment').order_by('-creat_la')
     tokeni = formular.tokeni.all().order_by('-creat_la')
     campuri = formular.campuri.all().order_by('ordine')
 
     reviews_data = []
     for r in reviews:
-        raspunsuri = r.raspunsuri.select_related('camp', 'camp__persoana').order_by('camp__ordine')
+        raspunsuri = r.raspunsuri.select_related('camp', 'camp__persoana', 'sentiment').order_by('camp__ordine')
         reviews_data.append({
             'turnatorie': r,
             'raspunsuri': raspunsuri,
@@ -258,6 +258,12 @@ def token_formular(request, token):
                 camp=camp,
                 valoare=valoare,
             )
+
+        try:
+            from agents.sentiment import analyze_turnatorie
+            analyze_turnatorie(turnatorie)
+        except Exception:
+            pass
 
         token_obj.folosit = True
         token_obj.save()

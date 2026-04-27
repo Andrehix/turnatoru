@@ -1,0 +1,242 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Turnatoru🐀 — Asistent AI{% endblock %}
+
+{% block navbar_right %}
+{% if user.is_authenticated %}
+<span class="nav-text">Salut, <strong style="color:#e94560;">{{ user.username }}</strong> 👋</span>
+<a href="{% url 'core:dashboard_creator' %}" class="btn btn-secondary">Dashboard 📊</a>
+<a href="{% url 'core:logout' %}" class="btn btn-secondary">Logout 🚪</a>
+{% else %}
+<a href="{% url 'core:token_login' %}" class="btn btn-primary">Intră cu Token 🎫</a>
+<a href="{% url 'core:login' %}" class="btn btn-secondary">Login 🔑</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title">🤖 Asistent AI</h1>
+<p class="page-subtitle">Te ajut să formulezi feedback mai bine sau să înțelegi răspunsurile primite.</p>
+
+<div style="max-width:720px; margin:0 auto;">
+    <div class="card" style="padding:0; overflow:hidden; border-radius:14px;">
+
+        <!-- zona mesaje -->
+        <div id="chat-messages">
+            <div class="ai-msg ai-msg--assistant">
+                <div class="ai-avatar">🤖</div>
+                <div class="ai-bubble ai-bubble--assistant">{% if user.is_authenticated %}Salut! Sunt asistentul AI al platformei Turnatoru. Te ajut să înțelegi feedback-ul primit și să tragi concluzii utile din el. Poți să îmi descrii ce răspunsuri ai primit sau ce te nedumerește.{% else %}Salut! Sunt asistentul AI al platformei Turnatoru. Te ajut să îți formulezi feedback-ul anonim cât mai clar și constructiv. Spune-mi — despre ce sau cine vrei să dai feedback?{% endif %}</div>
+            </div>
+        </div>
+
+        <!-- input -->
+        <div class="ai-input-bar">
+            <textarea id="user-input"
+                      class="ai-textarea"
+                      placeholder="Scrie mesajul tău... (Enter = trimite, Shift+Enter = linie nouă)"
+                      rows="2"></textarea>
+            <button id="send-btn" onclick="sendMessage()" class="btn btn-primary ai-send-btn">
+                Trimite 🚀
+            </button>
+        </div>
+    </div>
+
+    <p style="text-align:center; color:#555; font-size:0.8rem; margin-top:10px;">
+        🔒 Conversația nu este salvată pe server. Agentul nu îți cunoaște identitatea.
+    </p>
+</div>
+
+<style>
+/* zona mesaje */
+#chat-messages {
+    height: 460px;
+    overflow-y: auto;
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    scroll-behavior: smooth;
+}
+
+/* scrollbar custom */
+#chat-messages::-webkit-scrollbar { width: 6px; }
+#chat-messages::-webkit-scrollbar-track { background: transparent; }
+#chat-messages::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.12);
+    border-radius: 3px;
+}
+#chat-messages::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.22);
+}
+
+/* rand mesaj */
+.ai-msg {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+.ai-msg--user {
+    flex-direction: row-reverse;
+}
+
+/* avatar */
+.ai-avatar {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    margin-top: 2px;
+}
+.ai-avatar--user {
+    background: rgba(233,69,96,0.15);
+    border-color: rgba(233,69,96,0.25);
+}
+
+/* balon */
+.ai-bubble {
+    max-width: 75%;
+    padding: 11px 15px;
+    border-radius: 14px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+.ai-bubble--assistant {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #ddd;
+    border-top-left-radius: 4px;
+}
+.ai-bubble--user {
+    background: rgba(233,69,96,0.18);
+    border: 1px solid rgba(233,69,96,0.28);
+    color: #eee;
+    border-top-right-radius: 4px;
+    text-align: left;
+}
+.ai-bubble--thinking {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    color: #666;
+    font-style: italic;
+    border-top-left-radius: 4px;
+}
+
+/* bara input */
+.ai-input-bar {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    padding: 14px 16px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.02);
+}
+.ai-textarea {
+    flex: 1;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: #ddd;
+    resize: none;
+    font-family: inherit;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.ai-textarea:focus {
+    border-color: rgba(233,69,96,0.5);
+}
+.ai-send-btn {
+    flex-shrink: 0;
+    align-self: flex-end;
+    margin-bottom: 1px;
+}
+</style>
+
+<script>
+const history = [];
+
+function getCsrf() {
+    const match = document.cookie.match(/csrftoken=([^;]+)/);
+    return match ? match[1] : '';
+}
+
+function appendBubble(role, text) {
+    const box = document.getElementById('chat-messages');
+    const row = document.createElement('div');
+    row.className = `ai-msg ai-msg--${role}`;
+
+    const avatar = document.createElement('div');
+    avatar.className = role === 'user' ? 'ai-avatar ai-avatar--user' : 'ai-avatar';
+    avatar.textContent = role === 'user' ? '🐀' : '🤖';
+
+    const bubble = document.createElement('div');
+    bubble.className = `ai-bubble ai-bubble--${role}`;
+    bubble.textContent = text;
+
+    row.appendChild(avatar);
+    row.appendChild(bubble);
+    box.appendChild(row);
+    box.scrollTop = box.scrollHeight;
+    return bubble;
+}
+
+async function sendMessage() {
+    const input = document.getElementById('user-input');
+    const text = input.value.trim();
+    if (!text) return;
+
+    input.value = '';
+    input.disabled = true;
+    document.getElementById('send-btn').disabled = true;
+
+    appendBubble('user', text);
+    history.push({role: 'user', content: text});
+
+    const box = document.getElementById('chat-messages');
+    const thinkingRow = document.createElement('div');
+    thinkingRow.className = 'ai-msg ai-msg--assistant';
+    thinkingRow.innerHTML = '<div class="ai-avatar">🤖</div><div class="ai-bubble ai-bubble--thinking">🤔 Gândesc...</div>';
+    box.appendChild(thinkingRow);
+    box.scrollTop = box.scrollHeight;
+
+    try {
+        const res = await fetch('{% url "agents:chatbot" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrf(),
+            },
+            body: JSON.stringify({messages: history}),
+        });
+        const data = await res.json();
+        box.removeChild(thinkingRow);
+        const reply = data.response || 'Eroare: răspuns invalid de la server.';
+        appendBubble('assistant', reply);
+        history.push({role: 'assistant', content: reply});
+    } catch {
+        box.removeChild(thinkingRow);
+        appendBubble('assistant', 'Eroare de rețea. Încearcă din nou.');
+    }
+
+    input.disabled = false;
+    document.getElementById('send-btn').disabled = false;
+    input.focus();
+}
+
+document.getElementById('user-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+    }
+});
+</script>
+{% endblock %}

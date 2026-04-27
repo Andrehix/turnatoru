@@ -1,3 +1,5 @@
+anthropic
+python-dotenv
 asgiref==3.11.1
 charset-normalizer==3.4.4
 Django==6.0.3

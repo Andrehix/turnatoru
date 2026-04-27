@@ -47,9 +47,40 @@
             <span class="review-token">🐀 Turnătorie anonimă</span>
             <span>{{ r.turnatorie.creat_la|date:"d.m.Y H:i" }}</span>
         </div>
+
+        {% with s=r.turnatorie.sentiment %}{% if s %}
+        <div style="margin:10px 0 14px 0;">
+            <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                <span style="font-size:0.8rem; color:#aaa;">Sentiment general:</span>
+                <span class="badge {% if s.sentiment == 'pozitiv' %}badge-success{% elif s.sentiment == 'negativ' %}badge-danger{% else %}badge-warning{% endif %}">
+                    {% if s.sentiment == 'pozitiv' %}😊 Pozitiv{% elif s.sentiment == 'negativ' %}😠 Negativ{% else %}😐 Neutru{% endif %}
+                </span>
+            </div>
+            <div style="display:flex; height:8px; border-radius:6px; overflow:hidden; gap:2px;">
+                {% if s.procent_pozitiv %}<div style="width:{{ s.procent_pozitiv }}%; background:#2ed573;" title="Pozitiv {{ s.procent_pozitiv }}%"></div>{% endif %}
+                {% if s.procent_neutru %}<div style="width:{{ s.procent_neutru }}%; background:#ffa502;" title="Neutru {{ s.procent_neutru }}%"></div>{% endif %}
+                {% if s.procent_negativ %}<div style="width:{{ s.procent_negativ }}%; background:#e94560;" title="Negativ {{ s.procent_negativ }}%"></div>{% endif %}
+            </div>
+            <div style="display:flex; gap:12px; margin-top:4px; font-size:0.75rem; color:#aaa;">
+                <span style="color:#2ed573;">😊 {{ s.procent_pozitiv }}%</span>
+                <span style="color:#ffa502;">😐 {{ s.procent_neutru }}%</span>
+                <span style="color:#e94560;">😠 {{ s.procent_negativ }}%</span>
+            </div>
+        </div>
+        {% endif %}{% endwith %}
+
         {% for raspuns in r.raspunsuri %}
         <div style="padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
-            <span style="color:#ffa502; font-size:0.85rem;">👤 {{ raspuns.camp.persoana.nume }} — {{ raspuns.camp.intrebare }}</span>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                <span style="color:#ffa502; font-size:0.85rem;">👤 {{ raspuns.camp.persoana.nume }} — {{ raspuns.camp.intrebare }}</span>
+                {% if raspuns.valoare and raspuns.valoare.strip %}
+                {% with sr=raspuns.sentiment %}{% if sr %}
+                <span class="badge {% if sr.sentiment == 'pozitiv' %}badge-success{% elif sr.sentiment == 'negativ' %}badge-danger{% else %}badge-warning{% endif %}" style="font-size:0.7rem;">
+                    {% if sr.sentiment == 'pozitiv' %}😊{% elif sr.sentiment == 'negativ' %}😠{% else %}😐{% endif %} {{ sr.get_sentiment_display }}
+                </span>
+                {% endif %}{% endwith %}
+                {% endif %}
+            </div>
             <p class="review-text" style="margin-top:4px;">{% if raspuns.valoare %}{{ raspuns.valoare }}{% else %}<em style="color:#666;">(fără răspuns)</em>{% endif %}</p>
         </div>
         {% endfor %}
