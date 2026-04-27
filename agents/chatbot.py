@@ -5,13 +5,7 @@ try:
 except ImportError:
     anthropic = None
 
-SYSTEM_PROMPT = (
-    'Ești un asistent AI integrat în Turnatoru — o platformă românească de feedback anonim.\n'
-    'Rolul tău este să ajuți utilizatorii să:\n'
-    '1. Formuleze feedback constructiv și clar\n'
-    '2. Identifice punctele cheie pe care vor să le transmită\n'
-    '3. Exprime criticile sau laudele într-un mod profesionist\n'
-    '4. Înțeleagă mai bine răspunsurile primite\n\n'
+_BASE_RULES = (
     'Reguli:\n'
     '- Răspunde ÎNTOTDEAUNA în română\n'
     '- Fii concis și practic\n'
@@ -19,10 +13,45 @@ SYSTEM_PROMPT = (
     '- Dacă ți se cer date private despre alți utilizatori, refuză politicos'
 )
 
+SYSTEM_PROMPT_TURNATOR = (
+    'Ești un asistent AI integrat în Turnatoru — o platformă românească de feedback anonim.\n'
+    'Vorbești cu un TURNĂTOR — cineva care vrea să trimită feedback anonim despre colegi sau superiori.\n'
+    'Rolul tău este să îl ajuți să:\n'
+    '1. Formuleze feedback clar, constructiv și la obiect\n'
+    '2. Exprime criticile sau laudele profesionist, fără să fie ofensator\n'
+    '3. Identifice ce e cu adevărat important de transmis\n'
+    '4. Se simtă în siguranță — feedback-ul e complet anonim\n\n'
+    + _BASE_RULES
+)
 
-def get_chat_response(messages: list[dict]) -> str:
+SYSTEM_PROMPT_CREATOR = (
+    'Ești un asistent AI integrat în Turnatoru — o platformă românească de feedback anonim.\n'
+    'Vorbești cu un CREATOR — cineva care a creat formulare de feedback și a primit răspunsuri anonime.\n'
+    'Rolul tău este să îl ajuți să:\n'
+    '1. Înțeleagă și interpreteze feedback-ul primit\n'
+    '2. Identifice pattern-uri și teme comune în răspunsuri\n'
+    '3. Formuleze un plan de acțiune bazat pe feedback\n'
+    '4. Răspundă constructiv la critici, chiar și la cele dure\n\n'
+    + _BASE_RULES
+)
+
+WELCOME_TURNATOR = (
+    'Salut! Sunt asistentul AI al platformei Turnatoru. '
+    'Te ajut să îți formulezi feedback-ul anonim cât mai clar și constructiv. '
+    'Spune-mi — despre ce sau cine vrei să dai feedback?'
+)
+
+WELCOME_CREATOR = (
+    'Salut! Sunt asistentul AI al platformei Turnatoru. '
+    'Te ajut să înțelegi feedback-ul primit și să tragi concluzii utile din el. '
+    'Poți să îmi descrii ce răspunsuri ai primit sau ce te nedumerește.'
+)
+
+
+def get_chat_response(messages: list[dict], is_creator: bool = False) -> str:
     """Send conversation history to Claude and return the assistant reply.
 
+    Uses different system prompts depending on whether the user is a creator or anonymous.
     Falls back to a friendly error message when the API is unavailable.
     """
     api_key = os.environ.get('ANTHROPIC_API_KEY')
@@ -32,12 +61,14 @@ def get_chat_response(messages: list[dict]) -> str:
             'Administratorul trebuie să configureze ANTHROPIC_API_KEY.'
         )
 
+    system = SYSTEM_PROMPT_CREATOR if is_creator else SYSTEM_PROMPT_TURNATOR
+
     try:
         client = anthropic.Anthropic(api_key=api_key)
         response = client.messages.create(
             model='claude-sonnet-4-6',
             max_tokens=1024,
-            system=SYSTEM_PROMPT,
+            system=system,
             messages=messages,
         )
         return response.content[0].text

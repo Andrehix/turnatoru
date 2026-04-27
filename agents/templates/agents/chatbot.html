@@ -25,13 +25,15 @@
                     display:flex; flex-direction:column; gap:12px;">
             <div class="ai-msg ai-msg--assistant">
                 <div class="ai-bubble ai-bubble--assistant">
-                    Salut! Sunt asistentul AI al platformei Turnatoru. Te pot ajuta să:
-                    <ul style="margin:8px 0 0 18px; line-height:1.8;">
-                        <li>Formulezi feedback constructiv și clar</li>
-                        <li>Exprimi criticile sau laudele profesionist</li>
-                        <li>Înțelegi mai bine răspunsurile primite</li>
-                    </ul>
-                    Cu ce te pot ajuta astăzi?
+                    {% if user.is_authenticated %}
+                    Salut! Sunt asistentul AI al platformei Turnatoru.
+                    Te ajut să înțelegi feedback-ul primit și să tragi concluzii utile din el.
+                    Poți să îmi descrii ce răspunsuri ai primit sau ce te nedumerește.
+                    {% else %}
+                    Salut! Sunt asistentul AI al platformei Turnatoru.
+                    Te ajut să îți formulezi feedback-ul anonim cât mai clar și constructiv.
+                    Spune-mi — despre ce sau cine vrei să dai feedback?
+                    {% endif %}
                 </div>
             </div>
         </div>

@@ -35,5 +35,5 @@ def chatbot_view(request):
     if not valid:
         return JsonResponse({'error': 'Niciun mesaj valid'}, status=400)
 
-    reply = get_chat_response(valid)
+    reply = get_chat_response(valid, is_creator=request.user.is_authenticated)
     return JsonResponse({'response': reply})
