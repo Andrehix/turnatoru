@@ -12,7 +12,7 @@ Proiectul este structurat pe 3 roluri principale:
 ## 🛠️ Tehnologii Folosite
 
 * **Backend:** Python & Django 🐍
-* **Baza de date:** SQLite 🗄️
+* **Baza de date:** PostGreSQL 🗄️
 * **Frontend:** HTML & CSS (cu o tematică foarte hazlie) 🎨
 * **Hosting:** Render ☁️
 
