@@ -1,5 +1,10 @@
 import os
 
+try:
+    import anthropic
+except ImportError:
+    anthropic = None
+
 SENTIMENT_CHOICES = ('pozitiv', 'neutru', 'negativ')
 
 
@@ -12,12 +17,10 @@ def analyze_sentiment(text: str) -> str:
         return 'neutru'
 
     api_key = os.environ.get('ANTHROPIC_API_KEY')
-    if not api_key:
+    if not api_key or anthropic is None:
         return 'neutru'
 
     try:
-        import anthropic
-
         client = anthropic.Anthropic(api_key=api_key)
         message = client.messages.create(
             model='claude-sonnet-4-20250514',

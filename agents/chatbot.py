@@ -1,5 +1,10 @@
 import os
 
+try:
+    import anthropic
+except ImportError:
+    anthropic = None
+
 SYSTEM_PROMPT = (
     'Ești un asistent AI integrat în Turnatoru — o platformă românească de feedback anonim.\n'
     'Rolul tău este să ajuți utilizatorii să:\n'
@@ -21,15 +26,13 @@ def get_chat_response(messages: list[dict]) -> str:
     Falls back to a friendly error message when the API is unavailable.
     """
     api_key = os.environ.get('ANTHROPIC_API_KEY')
-    if not api_key:
+    if not api_key or anthropic is None:
         return (
             'Agentul AI nu este disponibil momentan. '
             'Administratorul trebuie să configureze ANTHROPIC_API_KEY.'
         )
 
     try:
-        import anthropic
-
         client = anthropic.Anthropic(api_key=api_key)
         response = client.messages.create(
             model='claude-sonnet-4-20250514',
