@@ -46,18 +46,37 @@ def analyze_sentiment(text: str) -> str:
 
 
 def analyze_turnatorie(turnatorie) -> str:
-    """Analyze sentiment for a Turnatorie instance and persist the result.
+    from .models import SentimentResult, SentimentRaspuns
 
-    Safe to call even if the agents app models are not migrated yet.
-    """
-    from .models import SentimentResult
+    raspunsuri = list(turnatorie.raspunsuri.all())
+    sentimente = []
 
-    raspunsuri = turnatorie.raspunsuri.all()
-    texts = [r.valoare for r in raspunsuri if r.valoare and r.valoare.strip()]
-    sentiment = analyze_sentiment('\n'.join(texts)) if texts else 'neutru'
+    for r in raspunsuri:
+        if r.valoare and r.valoare.strip():
+            s = analyze_sentiment(r.valoare)
+        else:
+            s = 'neutru'
+        SentimentRaspuns.objects.update_or_create(raspuns=r, defaults={'sentiment': s})
+        sentimente.append(s)
+
+    if not sentimente:
+        dominant = 'neutru'
+        poz = neut = neg = 0
+    else:
+        total = len(sentimente)
+        poz = round(sentimente.count('pozitiv') * 100 / total)
+        neut = round(sentimente.count('neutru') * 100 / total)
+        neg = 100 - poz - neut
+        counts = {'pozitiv': poz, 'neutru': neut, 'negativ': neg}
+        dominant = max(counts, key=counts.get)
 
     SentimentResult.objects.update_or_create(
         turnatorie=turnatorie,
-        defaults={'sentiment': sentiment},
+        defaults={
+            'sentiment': dominant,
+            'procent_pozitiv': poz,
+            'procent_neutru': neut,
+            'procent_negativ': neg,
+        },
     )
-    return sentiment
+    return dominant

@@ -191,7 +191,7 @@ def dashboard_creator_formular(request, formular_id):
 
     reviews_data = []
     for r in reviews:
-        raspunsuri = r.raspunsuri.select_related('camp', 'camp__persoana').order_by('camp__ordine')
+        raspunsuri = r.raspunsuri.select_related('camp', 'camp__persoana', 'sentiment').order_by('camp__ordine')
         reviews_data.append({
             'turnatorie': r,
             'raspunsuri': raspunsuri,
