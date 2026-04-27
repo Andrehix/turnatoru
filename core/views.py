@@ -389,6 +389,38 @@ def export_pdf(request, formular_id):
     doc.build(elements)
     buffer.seek(0)
 
+
     response = HttpResponse(buffer, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="raport_{formular.titlu}.pdf"'
     return response
+
+# --- DRF ViewSets for React Frontend ---
+from rest_framework import viewsets
+from .serializers import (
+    PersoanaSerializer, FormularSerializer, CampFormularSerializer,
+    TokenTurnatorSerializer, RaspunsCampSerializer, TurnatorieSerializer
+)
+
+class PersoanaViewSet(viewsets.ModelViewSet):
+    queryset = Persoana.objects.all()
+    serializer_class = PersoanaSerializer
+
+class FormularViewSet(viewsets.ModelViewSet):
+    queryset = Formular.objects.all()
+    serializer_class = FormularSerializer
+
+class CampFormularViewSet(viewsets.ModelViewSet):
+    queryset = CampFormular.objects.all()
+    serializer_class = CampFormularSerializer
+
+class TokenTurnatorViewSet(viewsets.ModelViewSet):
+    queryset = TokenTurnator.objects.all()
+    serializer_class = TokenTurnatorSerializer
+
+class RaspunsCampViewSet(viewsets.ModelViewSet):
+    queryset = RaspunsCamp.objects.all()
+    serializer_class = RaspunsCampSerializer
+
+class TurnatorieViewSet(viewsets.ModelViewSet):
+    queryset = Turnatorie.objects.all()
+    serializer_class = TurnatorieSerializer

@@ -1,9 +1,19 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from . import views
 
 app_name = 'core'
 
+router = DefaultRouter()
+router.register(r'persoane', views.PersoanaViewSet)
+router.register(r'formulare', views.FormularViewSet)
+router.register(r'campuri', views.CampFormularViewSet)
+router.register(r'tokeni', views.TokenTurnatorViewSet)
+router.register(r'raspunsuri', views.RaspunsCampViewSet)
+router.register(r'turnatorii', views.TurnatorieViewSet)
+
 urlpatterns = [
+    path('api/', include(router.urls)),
     path('', views.home, name='home'),
     path('register/', views.register, name='register'),
     path('login/', views.login_view, name='login'),
