@@ -35,7 +35,7 @@ def get_chat_response(messages: list[dict]) -> str:
     try:
         client = anthropic.Anthropic(api_key=api_key)
         response = client.messages.create(
-            model='claude-sonnet-4-20250514',
+            model='claude-sonnet-4-6',
             max_tokens=1024,
             system=SYSTEM_PROMPT,
             messages=messages,

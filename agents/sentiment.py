@@ -23,7 +23,7 @@ def analyze_sentiment(text: str) -> str:
     try:
         client = anthropic.Anthropic(api_key=api_key)
         message = client.messages.create(
-            model='claude-sonnet-4-20250514',
+            model='claude-sonnet-4-6',
             max_tokens=10,
             messages=[{
                 'role': 'user',
