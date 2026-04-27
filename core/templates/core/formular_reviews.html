@@ -45,7 +45,14 @@
     <div class="review-card">
         <div class="review-meta">
             <span class="review-token">🐀 Turnătorie anonimă</span>
-            <span>{{ r.turnatorie.creat_la|date:"d.m.Y H:i" }}</span>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <span>{{ r.turnatorie.creat_la|date:"d.m.Y H:i" }}</span>
+                {% with s=r.turnatorie.sentiment %}{% if s %}
+                <span class="badge {% if s.sentiment == 'pozitiv' %}badge-success{% elif s.sentiment == 'negativ' %}badge-danger{% else %}badge-warning{% endif %}">
+                    {% if s.sentiment == 'pozitiv' %}😊 Pozitiv{% elif s.sentiment == 'negativ' %}😠 Negativ{% else %}😐 Neutru{% endif %}
+                </span>
+                {% endif %}{% endwith %}
+            </div>
         </div>
         {% for raspuns in r.raspunsuri %}
         <div style="padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
