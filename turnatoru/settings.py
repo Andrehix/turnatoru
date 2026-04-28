@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 from dotenv import load_dotenv
+import os
 
 load_dotenv(Path(__file__).resolve().parent.parent / '.env')
 
@@ -91,7 +92,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'turnatoru_db',
         'USER': 'postgres',
-        'PASSWORD': 'password',
+        'PASSWORD': os.getenv('DB_PASSWORD'), # Citește parola din .env
         'HOST': 'localhost',
         'PORT': '5432',
     }
