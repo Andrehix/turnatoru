@@ -48,6 +48,7 @@ class CoreFlowTests(TestCase):
 
 		campuri = list(formular.campuri.order_by('ordine'))
 		self.assertEqual(len(campuri), 2)
+		self.assertEqual(CampFormular.objects.filter(formular=formular).count(), 2)
 		self.assertEqual(campuri[0].persoana, self.persoana_ana)
 		self.assertEqual(campuri[0].tip, 'text')
 		self.assertEqual(campuri[0].intrebare, 'Cum colaboreaza Ana?')
