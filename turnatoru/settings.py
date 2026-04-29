@@ -91,14 +91,24 @@ WSGI_APPLICATION = 'turnatoru.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'turnatoru_db',
-        'USER': 'postgres',
-        'PASSWORD': os.getenv('DB_PASSWORD'), # Citește parola din .env
-        'HOST': 'localhost',
-        'PORT': '5432',
+IS_GITHUB_ACTIONS = os.environ.get('GITHUB_ACTIONS') == 'true'
+
+if IS_GITHUB_ACTIONS:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',  # Rulează totul în RAM, super rapid pentru teste
+        }
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'turnatoru_db',
+            'USER': 'postgres',
+            'PASSWORD': os.getenv('DB_PASSWORD'), # Citește parola din .env
+            'HOST': 'localhost',
+            'PORT': '5432',
     }
 }
 
