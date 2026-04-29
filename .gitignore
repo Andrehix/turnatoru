@@ -1,3 +1,9 @@
 venv
 .aider*
 .env
+# Fișiere de sistem
+.DS_Store
+Thumbs.db
+# Cache-ul de Python (să nu apară folderele alea cu verde din poza ta)
+__pycache__/
+*.py[cod]

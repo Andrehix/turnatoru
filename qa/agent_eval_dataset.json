@@ -1,0 +1,80 @@
+{
+  "project": "Turnatoru",
+  "purpose": "Evaluation dataset for anonymization and sentiment-analysis agents",
+  "anonymization_agent": {
+    "placeholder_policy": {
+      "person_name": "[NUME]",
+      "email": "[EMAIL]",
+      "phone": "[TELEFON]",
+      "company": "[COMPANIE]",
+      "location": "[LOCATIE]"
+    },
+    "cases": [
+      {
+        "id": "anon-01",
+        "input": "Maria Popescu din Bucuresti a trimis feedback pentru Andrei Ionescu la adresa maria.popescu@example.com si numarul 0722123456.",
+        "expected_output": "[NUME] din [LOCATIE] a trimis feedback pentru [NUME] la adresa [EMAIL] si numarul [TELEFON].",
+        "focus": ["names", "email", "phone", "location"]
+      },
+      {
+        "id": "anon-02",
+        "input": "Ion Vasile lucreaza la ByteForge si mentioneaza in raportul intern ca Ana Marin intarzie des.",
+        "expected_output": "[NUME] lucreaza la [COMPANIE] si mentioneaza in raportul intern ca [NUME] intarzie des.",
+        "focus": ["names", "company"]
+      },
+      {
+        "id": "anon-03",
+        "input": "Suna-l pe 0755 111 222 sau scrie-i lui Radu Stan despre proiect.",
+        "expected_output": "Suna-l pe [TELEFON] sau scrie-i lui [NUME] despre proiect.",
+        "focus": ["phone", "name"]
+      },
+      {
+        "id": "anon-04",
+        "input": "Elena Gheorghe a spus ca firma TechNova SRL are un proces slab de comunicare.",
+        "expected_output": "[NUME] a spus ca firma [COMPANIE] are un proces slab de comunicare.",
+        "focus": ["name", "company"]
+      },
+      {
+        "id": "anon-05",
+        "input": "Feedback pentru Vlad I. de la sediul din Cluj-Napoca: se prezinta bine la sedinte.",
+        "expected_output": "Feedback pentru [NUME] de la sediul din [LOCATIE]: se prezinta bine la sedinte.",
+        "focus": ["name", "location"]
+      }
+    ]
+  },
+  "sentiment_analysis_agent": {
+    "labels": ["pozitiv", "neutru", "negativ"],
+    "cases": [
+      {
+        "id": "sent-01",
+        "input": "Colegul meu a livrat totul la timp si a comunicat impecabil.",
+        "expected_label": "pozitiv"
+      },
+      {
+        "id": "sent-02",
+        "input": "Feedback-ul este acceptabil, fara observatii majore.",
+        "expected_label": "neutru"
+      },
+      {
+        "id": "sent-03",
+        "input": "Nu respecta termenele si creeaza probleme echipei.",
+        "expected_label": "negativ"
+      },
+      {
+        "id": "sent-04",
+        "input": "Munca lui este buna, dar mai are de lucrat la organizare.",
+        "expected_label": "neutru"
+      },
+      {
+        "id": "sent-05",
+        "input": "Sunt foarte multumit de ajutorul primit, a fost rapid si clar.",
+        "expected_label": "pozitiv"
+      },
+      {
+        "id": "sent-06",
+        "input": "Nu imi place deloc cum gestioneaza comunicarea si raspunde foarte greu.",
+        "expected_label": "negativ"
+      }
+    ]
+  }
+}
