@@ -92,12 +92,20 @@ WSGI_APPLICATION = 'turnatoru.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 IS_GITHUB_ACTIONS = os.environ.get('GITHUB_ACTIONS') == 'true'
+USE_SQLITE = os.getenv('USE_SQLITE', 'true').lower() == 'true'
 
 if IS_GITHUB_ACTIONS:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': ':memory:',  # Rulează totul în RAM, super rapid pentru teste
+            'NAME': ':memory:',
+        }
+    }
+elif USE_SQLITE or not os.getenv('DB_PASSWORD'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
 else:
@@ -106,7 +114,7 @@ else:
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'turnatoru_db',
             'USER': 'postgres',
-            'PASSWORD': os.getenv('DB_PASSWORD'), # Citește parola din .env
+            'PASSWORD': os.getenv('DB_PASSWORD'),
             'HOST': 'localhost',
             'PORT': '5432',
     }
