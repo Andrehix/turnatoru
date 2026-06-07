@@ -7,3 +7,8 @@ Thumbs.db
 # Cache-ul de Python (să nu apară folderele alea cu verde din poza ta)
 __pycache__/
 *.py[cod]
+# Node.js dependencies și build
+node_modules/
+dist/
+.vite/
+.env.local
