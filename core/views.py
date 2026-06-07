@@ -267,8 +267,11 @@ def token_formular(request, token):
 
         token_obj.folosit = True
         token_obj.save()
+        request.session.pop('current_token', None)
         messages.success(request, '🎉 Turnătoria ta a fost salvată! Mulțumim că ai avut curajul (sau nesimțirea) să fii sincer.')
         return render(request, 'core/token_succes.html', {'formular': formular})
+
+    request.session['current_token'] = token
 
     persoane_campuri = {}
     for camp in campuri:

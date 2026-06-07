@@ -24,7 +24,7 @@
         <div id="chat-messages">
             <div class="ai-msg ai-msg--assistant">
                 <div class="ai-avatar">🤖</div>
-                <div class="ai-bubble ai-bubble--assistant">{% if user.is_authenticated %}Salut! Sunt asistentul AI al platformei Turnatoru. Te ajut să înțelegi feedback-ul primit și să tragi concluzii utile din el. Poți să îmi descrii ce răspunsuri ai primit sau ce te nedumerește.{% else %}Salut! Sunt asistentul AI al platformei Turnatoru. Te ajut să îți formulezi feedback-ul anonim cât mai clar și constructiv. Spune-mi — despre ce sau cine vrei să dai feedback?{% endif %}</div>
+                <div class="ai-bubble ai-bubble--assistant">{% if user.is_authenticated %}Salut, {{ user.username }}! Sunt asistentul AI al platformei Turnatoru. Am acces la formularele și răspunsurile tale, deci poți să mă întrebi direct — de exemplu: "Crezi că Marius e sincer față de ceilalți?" sau "Care e tendința generală la formularul X?".{% else %}Salut! Sunt asistentul AI al platformei Turnatoru. {% if request.session.current_token %}Știu la ce formular ai acces, deci te pot ajuta să formulezi răspunsuri clare și constructive. Spune-mi cu ce ai nevoie.{% else %}Te ajut să îți formulezi feedback-ul anonim cât mai clar și constructiv. Spune-mi — despre ce sau cine vrei să dai feedback?{% endif %}{% endif %}</div>
             </div>
         </div>
 
@@ -41,7 +41,11 @@
     </div>
 
     <p style="text-align:center; color:#555; font-size:0.8rem; margin-top:10px;">
-        🔒 Conversația nu este salvată pe server. Agentul nu îți cunoaște identitatea.
+        {% if user.is_authenticated %}
+        🧠 Agentul are acces la datele tale din platformă pentru a răspunde mai precis. Conversația nu este salvată.
+        {% else %}
+        🔒 Conversația nu este salvată pe server. Feedback-ul tău rămâne anonim.
+        {% endif %}
     </p>
 </div>
 
