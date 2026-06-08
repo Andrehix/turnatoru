@@ -300,6 +300,22 @@ def dashboard_admin(request):
     })
 
 
+def _escape_reportlab_text(text):
+    """Escape special characters for ReportLab Paragraph rendering."""
+    if not text:
+        return text
+    replacements = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&apos;',
+    }
+    for char, escaped in replacements.items():
+        text = text.replace(char, escaped)
+    return text
+
+
 @login_required(login_url='/')
 def export_pdf(request, formular_id):
     from reportlab.lib.pagesizes import A4
@@ -341,8 +357,8 @@ def export_pdf(request, formular_id):
 
     elements = []
     elements.append(Paragraph('Raport de Sinceritate Bruta', title_style))
-    elements.append(Paragraph(f'Formular: {formular.titlu}', subtitle_style))
-    elements.append(Paragraph(f'Creator: {formular.creator.username} | Data: {formular.creat_la.strftime("%d.%m.%Y %H:%M")}', subtitle_style))
+    elements.append(Paragraph(f'Formular: {_escape_reportlab_text(formular.titlu)}', subtitle_style))
+    elements.append(Paragraph(f'Creator: {_escape_reportlab_text(formular.creator.username)} | Data: {formular.creat_la.strftime("%d.%m.%Y %H:%M")}', subtitle_style))
     elements.append(Spacer(1, 0.5*cm))
 
     persoane_dict = {}
@@ -356,20 +372,20 @@ def export_pdf(request, formular_id):
 
     for pers_id, pers_data in persoane_dict.items():
         persoana = pers_data['persoana']
-        elements.append(Paragraph(f'Persoana: {persoana.nume}', heading_style))
+        elements.append(Paragraph(f'Persoana: {_escape_reportlab_text(persoana.nume)}', heading_style))
 
         for camp in pers_data['campuri']:
             tip_label = 'Text Liber' if camp.tip == 'text' else 'Alegere Multipla'
-            elements.append(Paragraph(f'Intrebare ({tip_label}): {camp.intrebare}', normal_style))
+            elements.append(Paragraph(f'Intrebare ({tip_label}): {_escape_reportlab_text(camp.intrebare)}', normal_style))
 
             if camp.tip == 'optiuni' and camp.optiuni:
-                elements.append(Paragraph(f'  Optiuni: {camp.optiuni}', normal_style))
+                elements.append(Paragraph(f'  Optiuni: {_escape_reportlab_text(camp.optiuni)}', normal_style))
 
             raspunsuri = RaspunsCamp.objects.filter(camp=camp).select_related('turnatorie')
             if raspunsuri.exists():
                 table_data = [['#', 'Raspuns', 'Data']]
                 for idx, r in enumerate(raspunsuri, 1):
-                    val = r.valoare if r.valoare else '(gol)'
+                    val = _escape_reportlab_text(r.valoare) if r.valoare else '(gol)'
                     data = r.turnatorie.creat_la.strftime('%d.%m.%Y %H:%M')
                     table_data.append([str(idx), val, data])
 
@@ -395,9 +411,9 @@ def export_pdf(request, formular_id):
     doc.build(elements)
     buffer.seek(0)
 
-
     response = HttpResponse(buffer, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="raport_{formular.titlu}.pdf"'
+    safe_filename = formular.titlu.replace('&', 'and').replace('<', '').replace('>', '').replace('"', '').replace("'", '').replace('/', '_').replace('\\', '_')
+    response['Content-Disposition'] = f'attachment; filename="raport_{safe_filename}.pdf"'
     return response
 
 # --- DRF ViewSets for React Frontend ---

@@ -1,31 +1,43 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import Dashboard from './pages/Dashboard';
-import CreateForm from './pages/CreateForm';
-import TokenLogin from './pages/TokenLogin';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import Login from './pages/Login'
+import Register from './pages/Register'
+import Dashboard from './pages/Dashboard'
+import FormBuilder from './pages/FormBuilder'
+import FormDetails from './pages/FormDetails'
+import TokenForm from './pages/TokenForm'
+import ResultsViewer from './pages/ResultsViewer'
+import Layout from './components/Layout'
 
 function App() {
+  const [isAuth, setIsAuth] = useState(!!localStorage.getItem('token'))
+
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    setIsAuth(!!token)
+  }, [])
+
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gray-100 font-sans text-gray-900">
-        <header className="bg-red-600 text-white p-4 shadow-md flex justify-between items-center">
-          <Link to="/" className="text-2xl font-bold hover:text-gray-200">Turnatoru 🐀</Link>
-          <Link to="/token" className="bg-white text-red-600 px-4 py-2 rounded font-bold shadow hover:bg-gray-100">Intră cu Token 🔑</Link>
-        </header>
-        <main className="p-6 max-w-4xl mx-auto">
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/create" element={<CreateForm />} />
-            <Route path="/token" element={<TokenLogin />} />
-          </Routes>
-        </main>
-      </div>
+      <Routes>
+        <Route path="/login" element={<Login setIsAuth={setIsAuth} />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/token/:tokenCode" element={<TokenForm />} />
+        
+        {isAuth ? (
+          <Route element={<Layout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/formular/create" element={<FormBuilder />} />
+            <Route path="/formular/:id" element={<FormDetails />} />
+            <Route path="/rezultate/:id" element={<ResultsViewer />} />
+            <Route path="/" element={<Navigate to="/dashboard" />} />
+          </Route>
+        ) : (
+          <Route path="/*" element={<Navigate to="/login" />} />
+        )}
+      </Routes>
     </BrowserRouter>
-  );
+  )
 }
 
-export default App;
+export default App
