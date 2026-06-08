@@ -147,20 +147,27 @@ Used Claude Code (CLI) throughout the AI agents feature development:
 - Generated the Component Architecture Diagram in Mermaid
 - Used for debugging API integration issues (model ID, dotenv loading, ANTHROPIC_API_KEY detection)
 
-### Geo — Gemini Code Assist (Google)
+### Luca George-Iulian — Gemini Code Assist (Google)
 Used Gemini Code Assist in VS Code for the React frontend migration:
 - Generated base SPA structure with Vite, Tailwind CSS, and React Router
 - Implemented state management for `CreateForm.jsx` (dynamic field arrays)
 - Built `api.js` Axios service layer with `Promise.all` for concurrent API calls
 - Implemented token verification logic in `TokenLogin.jsx`
 
-### Iuli — GitHub Copilot
-Used for QA setup and testing:
+### Voiculet Iulian Alexandru — GitHub Copilot + Gemini (Google)
+Used GitHub Copilot and Gemini for QA setup and testing:
 - Generated test scaffolding and database setup for `pytest-django`
-- Wrote bug report scenario and UML diagrams
+- Wrote bug report scenario and UML diagrams (Class, Sequence)
 - Assisted with CI/CD workflow configuration
+- Used Gemini for agent evaluation dataset design
 
-### Andrei — (to be completed by Andrei)
+### Prodan Adrian-Andrei — Gemini (Browser) + VS Code Copilot (Gemini 3.1 Pro)
+Used Gemini in the browser to consult on project structure and core ideas, then VS Code Copilot with Gemini 3.1 Pro for the actual coding:
+- Planned the overall platform architecture (Django + DRF + React)
+- Designed the data models (`Formular`, `TokenTurnator`, `Turnatorie`, `Persoana`, `CampFormular`, `RaspunsCamp`)
+- Implemented the dynamic form builder with per-person question assignment
+- Built the Django template-based views (token login, form rendering, creator dashboard)
+- Configured CI/CD pipeline with GitHub Actions and Render auto-deploy
 
 ---
 
