@@ -1,6 +1,6 @@
 # Data Flow Diagram — Turnatoru
 
-## API Data Flow: Cum circulă datele prin sistem
+## API Data Flow: How Data Moves Through the System
 
 ```mermaid
 flowchart LR
@@ -9,7 +9,7 @@ flowchart LR
         Dashboard["Dashboard"]
         CreateForm["CreateForm"]
         TokenForm["TokenFormular"]
-        Chatbot["Chatbot UI"]
+        ChatbotUI["Chatbot UI"]
         Reviews["FormularReviews"]
     end
 
@@ -20,18 +20,41 @@ flowchart LR
     end
 
     subgraph Django["Django (runserver :8000)"]
-        DRF["DRF ViewSets\n/api/persoane/\n/api/formulare/\n/api/campuri/\n/api/tokeni/\n/api/turnatorii/\n/api/raspunsuri/"]
-        Auth["Auth Views\n/api/login/\n/api/register/\n/api/user/\n/api/submit/"]
-        CB["Chatbot View\nPOST /agents/chatbot/"]
+        DRF["DRF ViewSets
+/api/persoane/
+/api/formulare/
+/api/campuri/
+/api/tokeni/
+/api/turnatorii/
+/api/raspunsuri/"]
+        Auth["Auth Views
+/api/login/
+/api/register/
+/api/user/
+/api/submit/"]
+        CB["Chatbot View
+POST /agents/chatbot/"]
     end
 
     subgraph AI["AI Agents"]
-        Sentiment["Sentiment Agent\nanalyze_turnatorie()\n→ SentimentResult\n→ SentimentRaspuns"]
-        Claude["Claude API\nclaude-sonnet-4-6"]
+        Sentiment["Sentiment Agent
+analyze_turnatorie()
+→ SentimentResult
+→ SentimentRaspuns"]
+        Claude["Claude API
+claude-sonnet-4-6"]
     end
 
     subgraph DB["PostgreSQL"]
-        Tables["Users\nPersoane\nFormulare\nCampuri\nTokeni\nTurnatorii\nRaspunsuri\nSentimentResults\nSentimentRaspuns"]
+        Tables["Users
+People
+Forms
+Fields
+Tokens
+Submissions
+Responses
+SentimentResults
+SentimentResponses"]
     end
 
     %% Frontend → Proxy → Django
@@ -41,7 +64,7 @@ flowchart LR
     TokenForm -->|GET /api/campuri/| P1
     TokenForm -->|POST /api/submit/| P1
     Reviews -->|GET /api/turnatorii/| P1
-    Chatbot -->|POST /agents/chatbot/| P2
+    ChatbotUI -->|POST /agents/chatbot/| P2
 
     P1 --> DRF
     P1 --> Auth
@@ -49,17 +72,17 @@ flowchart LR
 
     %% Django → Database
     DRF -->|CRUD| Tables
-    Auth -->|Sesiuni + Useri| Tables
-    CB -->|Context DB| Tables
+    Auth -->|Sessions + Users| Tables
+    CB -->|DB Context| Tables
 
     %% Django → AI
-    Auth -->|După submit| Sentiment
+    Auth -->|After submit| Sentiment
     Sentiment -->|API Call| Claude
-    Claude -->|Răspuns JSON| Sentiment
-    Sentiment -->|Salvează| Tables
+    Claude -->|JSON Response| Sentiment
+    Sentiment -->|Saves| Tables
 
     CB -->|System Prompt + User Data| Claude
-    Claude -->|Răspuns text| CB
+    Claude -->|Text Response| CB
 
     %% Database → Frontend
     Tables -->|JSON Response| DRF
@@ -68,18 +91,18 @@ flowchart LR
 
 ## Data Flow Steps
 
-### 1. Creator creează formular
+### 1. Creator creates a form
 ```
-CreateForm.jsx → POST /api/formulare/ → FormularViewSet.perform_create() → PostgreSQL
-CreateForm.jsx → POST /api/campuri/ (×N) → CampFormularViewSet → PostgreSQL
+CreateForm.jsx → POST /api/formulare/ → FormularViewSet.perform_create() → DB
+CreateForm.jsx → POST /api/campuri/ (×N) → CampFormularViewSet → DB
 ```
 
-### 2. Turnător trimite feedback
+### 2. Respondent submits feedback
 ```
-TokenFormular.jsx → POST /api/submit/ {token, raspunsuri}
-  → Verifică token (valid + nefolosit)
-  → Creează Turnatorie + RaspunsCamp[]
-  → Marchează token folosit
+TokenFormular.jsx → POST /api/submit/ {token, responses}
+  → Validates token (exists + unused)
+  → Creates Turnatorie + RaspunsCamp[]
+  → Marks token as used
   → Sentiment Agent → Claude API → SentimentResult + SentimentRaspuns
   ← JSON {ok: true}
 ```
@@ -87,16 +110,16 @@ TokenFormular.jsx → POST /api/submit/ {token, raspunsuri}
 ### 3. Chatbot AI
 ```
 Chatbot UI → POST /agents/chatbot/ {messages[]}
-  → Injectează context DB (formulare, răspunsuri, sentimente)
+  → Injects DB context (forms, responses, sentiment scores)
   → Claude API (system prompt + context + user messages)
   ← JSON {response: "..."}
 ```
 
-### 4. Creator vede reviews
+### 4. Creator views reviews
 ```
 FormularReviews.jsx → GET /api/formulare/{id}/
                     → GET /api/campuri/?formular={id}
                     → GET /api/turnatorii/?formular={id}
                     → GET /api/raspunsuri/?turnatorie={id} (×N)
-  ← JSON cu sentiment_label, persoana_nume, etc.
+  ← JSON with sentiment_label, persoana_nume, etc.
 ```

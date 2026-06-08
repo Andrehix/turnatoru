@@ -46,60 +46,61 @@ classDiagram
 
     class SentimentResult {
         +sentiment: CharField
-        +procent_pozitiv: IntegerField
-        +procent_neutru: IntegerField
-        +procent_negativ: IntegerField
+        +procent_pozitiv: PositiveSmallIntegerField
+        +procent_neutru: PositiveSmallIntegerField
+        +procent_negativ: PositiveSmallIntegerField
+        +analizat_la: DateTimeField
     }
 
     class SentimentRaspuns {
         +sentiment: CharField
     }
 
-    User "1" --> "many" Formular : creeaza
-    User "1" --> "many" Persoana : defineste
-    Formular "1" --> "many" TokenTurnator : genereaza
-    Formular "1" --> "many" CampFormular : contine
-    Persoana "1" --> "many" CampFormular : apartine
-    Formular "1" --> "many" Turnatorie : primeste
-    Turnatorie "1" --> "many" RaspunsCamp : include
-    CampFormular "1" --> "many" RaspunsCamp : primeste
-    Turnatorie "1" --> "0..1" TokenTurnator : valideaza
-    Turnatorie "1" --> "0..1" SentimentResult : analizeaza
-    RaspunsCamp "1" --> "0..1" SentimentRaspuns : analizeaza
+    User "1" --> "many" Formular : creates
+    User "1" --> "many" Persoana : defines
+    Formular "1" --> "many" TokenTurnator : generates
+    Formular "1" --> "many" CampFormular : contains
+    Persoana "1" --> "many" CampFormular : belongs to
+    Formular "1" --> "many" Turnatorie : receives
+    Turnatorie "1" --> "many" RaspunsCamp : includes
+    CampFormular "1" --> "many" RaspunsCamp : receives
+    Turnatorie "1" --> "0..1" TokenTurnator : validates
+    Turnatorie "1" --> "0..1" SentimentResult : has
+    RaspunsCamp "1" --> "0..1" SentimentRaspuns : has
 ```
 
-## Sequence Diagram
+## Sequence Diagram — Token Submission & Sentiment Analysis
 
 ```mermaid
 sequenceDiagram
     actor Respondent
     participant Browser
-    participant TokenView as Django Token View
+    participant DjangoView as Django Token View
     participant DB as Database
     participant Sentiment as Sentiment Agent
+    participant Claude as Claude API
 
-    Respondent->>Browser: Introduce tokenul unic
-    Browser->>TokenView: POST /token-login/
-    TokenView->>DB: cauta TokenTurnator dupa cod
-    DB-->>TokenView: token gasit sau eroare
+    Respondent->>Browser: Enters unique token
+    Browser->>DjangoView: POST /api/submit/ {token, responses}
+    DjangoView->>DB: Looks up TokenTurnator by code
 
-    alt Token valid si nefolosit
-        TokenView-->>Browser: redirect spre formular
-        Browser->>TokenView: GET /token/{cod}/
-        TokenView->>DB: incarca formularul si campurile dinamice
-        DB-->>TokenView: datele formularului
-        TokenView-->>Browser: randare formular anonim
-        Respondent->>Browser: Completeaza feedback-ul
-        Browser->>TokenView: POST /token/{cod}/ cu raspunsuri
-        TokenView->>DB: creeaza Turnatorie
-        loop Pentru fiecare intrebare dinamica
-            TokenView->>DB: creeaza RaspunsCamp
+    alt Token valid and unused
+        DjangoView->>DB: Creates Turnatorie
+        loop For each dynamic question
+            DjangoView->>DB: Creates RaspunsCamp
         end
-        TokenView->>Sentiment: analizeaza_turnatorie(turnatorie)
-        Sentiment->>DB: salveaza SentimentRaspuns si SentimentResult
-        TokenView->>DB: marcheaza tokenul ca folosit
-        TokenView-->>Browser: afiseaza pagina de succes
-    else Token lipsa, invalid sau deja folosit
-        TokenView-->>Browser: afiseaza eroare sau pagina de token expirat
+        DjangoView->>DB: Marks token as used
+        DjangoView->>Sentiment: analyze_turnatorie(turnatorie)
+        loop For each response
+            Sentiment->>Claude: Classify sentiment
+            Claude-->>Sentiment: "positive" / "neutral" / "negative"
+            Sentiment->>DB: Saves SentimentRaspuns
+        end
+        Sentiment->>DB: Saves SentimentResult (percentages)
+        DjangoView-->>Browser: JSON {ok: true}
+        Browser-->>Respondent: Success page
+    else Token missing, invalid, or already used
+        DjangoView-->>Browser: JSON {error: "...", tokeni_ramasi: [...]}
+        Browser-->>Respondent: Error or expired token page
     end
 ```

@@ -1,7 +1,7 @@
 # Turnatoru 🐀
 
 An anonymous feedback platform built with Django. Users create feedback forms, distribute unique tokens, and collect fully anonymous responses ("turnătorii"). Integrated AI agents analyze sentiment and assist users via a context-aware chatbot.
-
+🎥 **Demo Link:** [View the demo here](https://drive.google.com/file/d/14pNIy1uqkptyABsmr7vbwvI0N8JafoPF/view?usp=drive_link) 🍿
 
 ---
 
