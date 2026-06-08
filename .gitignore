@@ -1,4 +1,4 @@
-venv
+venv/
 .aider*
 .env
 # Fișiere de sistem
@@ -12,3 +12,7 @@ node_modules/
 dist/
 .vite/
 .env.local
+# Bază de date locală
+db.sqlite3
+# Lock files (nu sunt necesare în repo)
+package-lock.json
