@@ -48,12 +48,7 @@ WELCOME_CREATOR = (
 )
 
 
-def get_chat_response(messages: list[dict], is_creator: bool = False) -> str:
-    """Send conversation history to Claude and return the assistant reply.
-
-    Uses different system prompts depending on whether the user is a creator or anonymous.
-    Falls back to a friendly error message when the API is unavailable.
-    """
+def get_chat_response(messages: list[dict], is_creator: bool = False, context: str = '') -> str:
     api_key = os.environ.get('ANTHROPIC_API_KEY')
     if not api_key or anthropic is None:
         return (
@@ -62,6 +57,8 @@ def get_chat_response(messages: list[dict], is_creator: bool = False) -> str:
         )
 
     system = SYSTEM_PROMPT_CREATOR if is_creator else SYSTEM_PROMPT_TURNATOR
+    if context:
+        system += f'\n\n{context}'
 
     try:
         client = anthropic.Anthropic(api_key=api_key)

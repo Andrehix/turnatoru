@@ -24,7 +24,7 @@
         <div id="chat-messages">
             <div class="ai-msg ai-msg--assistant">
                 <div class="ai-avatar">🤖</div>
-                <div class="ai-bubble ai-bubble--assistant">{% if user.is_authenticated %}Salut! Sunt asistentul AI al platformei Turnatoru. Te ajut să înțelegi feedback-ul primit și să tragi concluzii utile din el. Poți să îmi descrii ce răspunsuri ai primit sau ce te nedumerește.{% else %}Salut! Sunt asistentul AI al platformei Turnatoru. Te ajut să îți formulezi feedback-ul anonim cât mai clar și constructiv. Spune-mi — despre ce sau cine vrei să dai feedback?{% endif %}</div>
+                <div class="ai-bubble ai-bubble--assistant">{% if user.is_authenticated %}Salut, {{ user.username }}! Sunt asistentul AI al platformei Turnatoru. Am acces la formularele și răspunsurile tale, deci poți să mă întrebi direct — de exemplu: "Crezi că Marius e sincer față de ceilalți?" sau "Care e tendința generală la formularul X?".{% else %}Salut! Sunt asistentul AI al platformei Turnatoru. {% if request.session.current_token %}Știu la ce formular ai acces, deci te pot ajuta să formulezi răspunsuri clare și constructive. Spune-mi cu ce ai nevoie.{% else %}Te ajut să îți formulezi feedback-ul anonim cât mai clar și constructiv. Spune-mi — despre ce sau cine vrei să dai feedback?{% endif %}{% endif %}</div>
             </div>
         </div>
 
@@ -41,7 +41,11 @@
     </div>
 
     <p style="text-align:center; color:#555; font-size:0.8rem; margin-top:10px;">
-        🔒 Conversația nu este salvată pe server. Agentul nu îți cunoaște identitatea.
+        {% if user.is_authenticated %}
+        🧠 Agentul are acces la datele tale din platformă pentru a răspunde mai precis. Conversația nu este salvată.
+        {% else %}
+        🔒 Conversația nu este salvată pe server. Feedback-ul tău rămâne anonim.
+        {% endif %}
     </p>
 </div>
 
@@ -105,8 +109,8 @@
     font-size: 0.9rem;
     line-height: 1.6;
     word-break: break-word;
-    white-space: pre-wrap;
 }
+.ai-bubble--user { white-space: pre-wrap; }
 .ai-bubble--assistant {
     background: rgba(255,255,255,0.05);
     border: 1px solid rgba(255,255,255,0.1);
@@ -120,6 +124,51 @@
     border-top-right-radius: 4px;
     text-align: left;
 }
+/* markdown rendered in assistant bubble */
+.ai-bubble--assistant h1,
+.ai-bubble--assistant h2,
+.ai-bubble--assistant h3 {
+    color: #eee;
+    margin: 10px 0 4px;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+.ai-bubble--assistant p { margin: 4px 0; }
+.ai-bubble--assistant ul,
+.ai-bubble--assistant ol {
+    padding-left: 18px;
+    margin: 4px 0;
+}
+.ai-bubble--assistant li { margin: 2px 0; }
+.ai-bubble--assistant table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 8px 0;
+    font-size: 0.85rem;
+}
+.ai-bubble--assistant th,
+.ai-bubble--assistant td {
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 5px 10px;
+    text-align: left;
+}
+.ai-bubble--assistant th {
+    background: rgba(255,255,255,0.08);
+    color: #eee;
+}
+.ai-bubble--assistant hr {
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    margin: 8px 0;
+}
+.ai-bubble--assistant strong { color: #fff; }
+.ai-bubble--assistant code {
+    background: rgba(255,255,255,0.08);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 0.85em;
+}
+
 .ai-bubble--thinking {
     background: rgba(255,255,255,0.03);
     border: 1px solid rgba(255,255,255,0.07);
@@ -161,6 +210,7 @@
 }
 </style>
 
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
 const history = [];
 
@@ -180,7 +230,11 @@ function appendBubble(role, text) {
 
     const bubble = document.createElement('div');
     bubble.className = `ai-bubble ai-bubble--${role}`;
-    bubble.textContent = text;
+    if (role === 'assistant') {
+        bubble.innerHTML = marked.parse(text);
+    } else {
+        bubble.textContent = text;
+    }
 
     row.appendChild(avatar);
     row.appendChild(bubble);
