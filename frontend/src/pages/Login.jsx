@@ -25,49 +25,62 @@ export default function Login({ setIsAuth }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center p-4">
-      <div className="card max-w-md w-full">
-        <div className="text-center mb-6">
-          <span className="text-4xl">🐀</span>
-          <h1 className="text-2xl font-bold mt-2">Turnatoru</h1>
-          <p className="text-gray-600 text-sm mt-1">Anonymous Feedback Platform</p>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse-slow"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-red-500/20 rounded-full blur-3xl animate-pulse-slow" style={{animationDelay: '1s'}}></div>
+      </div>
+
+      <div className="card max-w-md w-full relative z-10 backdrop-blur-xl border border-purple-500/20">
+        <div className="text-center mb-8">
+          <span className="text-6xl inline-block animate-float">🐀</span>
+          <h1 className="text-4xl font-bold mt-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Turnatoru</h1>
+          <p className="text-gray-400 text-sm mt-2">🗣️ Anonymous Feedback Platform</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="bg-red-50 text-red-700 p-3 rounded-lg text-sm">
-              {error}
+            <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-lg text-sm animate-slide-in">
+              ⚠️ {error}
             </div>
           )}
-          
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="input-base"
-          />
 
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="input-base"
-          />
+          <div className="space-y-2">
+            <label className="text-gray-300">Username</label>
+            <input
+              type="text"
+              placeholder="Enter your username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="input-base text-white"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-gray-300">Password</label>
+            <input
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="input-base text-white"
+            />
+          </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full btn-primary disabled:opacity-50"
+            className="w-full btn-primary py-3 text-lg mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? '⏳ Logging in...' : '🔓 Login'}
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-600 mt-4">
-          No account? <Link to="/register" className="text-primary font-semibold hover:underline">Sign up</Link>
-        </p>
+        <div className="mt-6 pt-6 border-t border-gray-700">
+          <p className="text-center text-gray-400 text-sm">
+            No account yet? <Link to="/register" className="text-transparent bg-gradient-to-r from-primary to-secondary bg-clip-text font-bold hover:opacity-80 transition">Create one</Link>
+          </p>
+        </div>
       </div>
     </div>
   )

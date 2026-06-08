@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from . import views
+from . import views, auth_views
 
 app_name = 'core'
 
@@ -13,6 +13,9 @@ router.register(r'raspunsuri', views.RaspunsCampViewSet)
 router.register(r'turnatorii', views.TurnatorieViewSet)
 
 urlpatterns = [
+    path('api/auth/register/', auth_views.register_api, name='register_api'),
+    path('api/auth/login/', auth_views.login_api, name='login_api'),
+    path('api/auth/logout/', auth_views.logout_api, name='logout_api'),
     path('api/', include(router.urls)),
     path('', views.home, name='home'),
     path('register/', views.register, name='register'),
