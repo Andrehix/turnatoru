@@ -2,7 +2,6 @@
 
 An anonymous feedback platform built with Django. Users create feedback forms, distribute unique tokens, and collect fully anonymous responses ("turnătorii"). Integrated AI agents analyze sentiment and assist users via a context-aware chatbot.
 
-**Live demo:** https://turnatoru.onrender.com
 
 ---
 
@@ -36,8 +35,7 @@ An anonymous feedback platform built with Django. Users create feedback forms, d
 - **Backend:** Python, Django 6, Django REST Framework
 - **Frontend:** Django templates + Vanilla JS; React 18 + Vite + Tailwind CSS (SPA)
 - **AI:** Anthropic Claude Sonnet 4.6 (via `anthropic` Python SDK)
-- **Database:** PostgreSQL (production, Render) / SQLite (local dev)
-- **Hosting:** Render.com (auto-deploy on push to `main`)
+- **Database:** PostgreSQL (production) / SQLite (local dev)
 - **CI/CD:** GitHub Actions (lint + test on every PR)
 
 ---
@@ -94,6 +92,8 @@ All diagrams are in the [`qa/`](./qa/) folder in Mermaid format.
 |---------|-------------|
 | [Component Architecture Diagram](./qa/component_architecture_diagram.md) | How Django, React, Chatbot Agent, Sentiment Agent, and PostgreSQL interact |
 | [Class & Sequence Diagrams](./qa/class_and_sequence_diagrams.md) | UML class diagram of all models + sequence diagram of the token submission flow |
+| [Workflow Diagram](./qa/workflow_diagram.md) | Complete user journey: Creator, Turnător, and Visitor flows |
+| [Data Flow Diagram](./qa/data_flow_diagram.md) | How data flows through React, Vite Proxy, Django, AI Agents, and PostgreSQL |
 
 ---
 
@@ -132,7 +132,6 @@ File: [`.github/workflows/ci.yml`](./.github/workflows/ci.yml)
 
 - **Trigger:** every push and pull request to `main`
 - **Steps:** `ruff` linter → `pytest` test suite
-- **Deploy:** Render auto-deploys on merge to `main` via webhook
 
 ---
 
@@ -148,11 +147,17 @@ Used Claude Code (CLI) throughout the AI agents feature development:
 - Used for debugging API integration issues (model ID, dotenv loading, ANTHROPIC_API_KEY detection)
 
 ### Luca George-Iulian — Gemini Code Assist (Google)
-Used Gemini Code Assist in VS Code for the React frontend migration:
-- Generated base SPA structure with Vite, Tailwind CSS, and React Router
-- Implemented state management for `CreateForm.jsx` (dynamic field arrays)
-- Built `api.js` Axios service layer with `Promise.all` for concurrent API calls
-- Implemented token verification logic in `TokenLogin.jsx`
+Used Gemini Code Assist (Google) to build the complete React frontend:
+
+- **Full SPA rebuild**: Scaffolded a fresh Vite + React 19 + Tailwind CSS 4 project as the new frontend
+- **9-page component suite**: `Home`, `Dashboard`, `CreateForm`, `TokenLogin`, `TokenFormular`, `Login` (unified login/register), `Persoane` (CRUD), `AdminDashboard`, `Chatbot` (AI chat interface), `FormularReviews` (response viewer with sentiment bars)
+- **Django-style dark theme**: Replicated the original color palette (`#1a1a2e` background, `#e94560` red accent, `#2ed573` green, `#ffa502` amber) and humorous Romanian copy across all components
+- **Axios API layer**: Configured Axios with CSRF token support, session credentials, and base URL pointing to the Vite dev server proxy
+- **Authentication**: Built custom Django REST endpoints (`POST /api/login/`, `POST /api/register/`) returning JSON; logout via `GET /logout/` with auth state refresh; dynamic header that shows username + Dashboard + Admin + Logout when logged in, or "Ai Token?" + "Login" when anonymous
+- **Form builder**: Dynamic field array with person selection, text/multiple-choice toggle, per-field validation; DRF `perform_create` auto-assigns the `creator` field
+- **Token flow**: Validation, expired token page listing remaining unused tokens as clickable codes, multi-step submission (create `Turnatorie` → create `RaspunsCamp` entries → trigger AI sentiment analysis → mark token used)
+- **Backend API enhancements**: Added `persoana_nume` and `sentiment_label` to DRF serializers, `@csrf_exempt` on all API ViewSets, filtered querysets to only return the authenticated user's data, added `?formular=` and `?turnatorie=` query parameter filtering
+- **Vite proxy**: Configured dev server to forward `/api`, `/agents`, `/dashboard`, `/login`, `/logout`, `/register`, `/token` to Django, sharing session cookies between frontend and backend
 
 ### Voiculet Iulian Alexandru — GitHub Copilot + Gemini (Google)
 Used GitHub Copilot and Gemini for QA setup and testing:
@@ -167,12 +172,13 @@ Used Gemini in the browser to consult on project structure and core ideas, then 
 - Designed the data models (`Formular`, `TokenTurnator`, `Turnatorie`, `Persoana`, `CampFormular`, `RaspunsCamp`)
 - Implemented the dynamic form builder with per-person question assignment
 - Built the Django template-based views (token login, form rendering, creator dashboard)
-- Configured CI/CD pipeline with GitHub Actions and Render auto-deploy
+- Configured CI/CD pipeline with GitHub Actions
 
 ---
 
 ## Local Setup
 
+### Backend (Django)
 ```bash
 git clone https://github.com/Andrehix/turnatoru.git
 cd turnatoru
@@ -184,10 +190,31 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-Environment variables needed (`.env`):
+### Frontend (React)
+```bash
+cd frontend
+npm install
+npm run dev
 ```
-SECRET_KEY=...
-ANTHROPIC_API_KEY=...
-DEBUG=True
-DATABASE_URL=...   # leave empty for SQLite locally
+
+### Environment variables (`.env`)
 ```
+ANTHROPIC_API_KEY=sk-ant-...    # Required for AI agents (sentiment + chatbot)
+DB_PASSWORD=...                 # Required for PostgreSQL (set USE_SQLITE=false)
+USE_SQLITE=false                # Set to false for PostgreSQL (default: true for SQLite)
+DEBUG=True                      # Set to False in production
+```
+
+### Database
+- **SQLite** (default) — no setup needed, uses `db.sqlite3`
+- **PostgreSQL** — set `USE_SQLITE=false` and `DB_PASSWORD` in `.env`, then create the database:
+  ```sql
+  CREATE DATABASE turnatoru_db;
+  ```
+
+### Access the app
+| Service | URL |
+|---------|-----|
+| React Frontend | http://localhost:5173 |
+| Django Backend | http://localhost:8000 |
+| Django Admin | http://localhost:8000/admin/ |

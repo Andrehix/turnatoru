@@ -4,8 +4,119 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.http import HttpResponse, JsonResponse
 from .models import Formular, TokenTurnator, Turnatorie, Persoana, CampFormular, RaspunsCamp
+
+
+def api_user(request):
+    if request.user.is_authenticated:
+        return JsonResponse({
+            'is_authenticated': True,
+            'username': request.user.username,
+            'is_staff': request.user.is_staff,
+        })
+    return JsonResponse({'is_authenticated': False})
+
+
+@csrf_exempt
+def api_submit_turnatorie(request):
+    """Submit a turnatorie atomically: validate token, save responses, mark token used, run AI."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Doar POST.'}, status=405)
+
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'JSON invalid.'}, status=400)
+
+    token_cod = data.get('token', '').strip().upper()
+    raspunsuri_data = data.get('raspunsuri', {})
+
+    if not token_cod:
+        return JsonResponse({'error': 'Token lipsă.'}, status=400)
+
+    try:
+        token_obj = TokenTurnator.objects.get(cod=token_cod)
+    except TokenTurnator.DoesNotExist:
+        return JsonResponse({'error': 'Token invalid.'}, status=404)
+
+    if token_obj.folosit:
+        # Return remaining tokens
+        tokeni_ramasi = list(TokenTurnator.objects.filter(
+            formular=token_obj.formular, folosit=False
+        ).values('cod', 'id'))
+        return JsonResponse({
+            'error': 'Token deja folosit.',
+            'formular_titlu': token_obj.formular.titlu,
+            'tokeni_ramasi': tokeni_ramasi,
+        }, status=409)
+
+    formular = token_obj.formular
+
+    # Create Turnatorie and all RaspunsCamp atomically
+    turnatorie = Turnatorie.objects.create(formular=formular)
+    for camp_id, valoare in raspunsuri_data.items():
+        RaspunsCamp.objects.create(
+            turnatorie=turnatorie,
+            camp_id=int(camp_id),
+            valoare=str(valoare),
+        )
+
+    # Mark token used
+    token_obj.folosit = True
+    token_obj.save()
+
+    # Run AI analysis (fire and forget)
+    try:
+        from agents.sentiment import analyze_turnatorie
+        analyze_turnatorie(turnatorie)
+    except Exception:
+        pass
+
+    return JsonResponse({'ok': True, 'turnatorie_id': turnatorie.id})
+
+
+@csrf_exempt
+def api_register(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Doar POST.'}, status=405)
+
+    username = request.POST.get('username', '').strip()
+    email = request.POST.get('email', '').strip()
+    password1 = request.POST.get('password1', '')
+    password2 = request.POST.get('password2', '')
+
+    if not username or not password1:
+        return JsonResponse({'error': 'Pune username și parolă.'}, status=400)
+    if password1 != password2:
+        return JsonResponse({'error': 'Parolele nu se potrivesc.'}, status=400)
+    if len(password1) < 4:
+        return JsonResponse({'error': 'Parola trebuie să aibă minim 4 caractere.'}, status=400)
+    if User.objects.filter(username=username).exists():
+        return JsonResponse({'error': f'Username-ul "{username}" e deja luat.'}, status=400)
+
+    user = User.objects.create_user(username=username, email=email, password=password1)
+    login(request, user)
+    return JsonResponse({'ok': True, 'username': user.username})
+
+
+@csrf_exempt
+def api_login(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Doar POST.'}, status=405)
+
+    username = request.POST.get('username', '')
+    password = request.POST.get('password', '')
+    print(f'[DEBUG api_login] username={username!r} password={password!r}', flush=True)
+    user = authenticate(request, username=username, password=password)
+    print(f'[DEBUG api_login] user={user!r}', flush=True)
+
+    if user is not None:
+        login(request, user)
+        return JsonResponse({'ok': True, 'username': user.username, 'is_staff': user.is_staff})
+    return JsonResponse({'error': 'Username sau parolă greșită.'}, status=400)
 
 
 def home(request):
@@ -420,33 +531,118 @@ def export_pdf(request, formular_id):
     response['Content-Disposition'] = f'attachment; filename="raport_{safe_filename}.pdf"'
     return response
 
+from rest_framework.decorators import action
+
 # --- DRF ViewSets for React Frontend ---
 from rest_framework import viewsets
+from rest_framework.permissions import AllowAny
 from .serializers import (
     PersoanaSerializer, FormularSerializer, CampFormularSerializer,
     TokenTurnatorSerializer, RaspunsCampSerializer, TurnatorieSerializer
 )
 
+@method_decorator(csrf_exempt, name='dispatch')
 class PersoanaViewSet(viewsets.ModelViewSet):
     queryset = Persoana.objects.all()
     serializer_class = PersoanaSerializer
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        user_id = self.request.query_params.get('creator')
+        if user_id:
+            return qs.filter(creator_id=user_id)
+        if self.request.user.is_authenticated:
+            return qs.filter(creator=self.request.user)
+        return qs.none()
+
+    def perform_create(self, serializer):
+        serializer.save(creator=self.request.user)
+
+@method_decorator(csrf_exempt, name='dispatch')
 class FormularViewSet(viewsets.ModelViewSet):
     queryset = Formular.objects.all()
     serializer_class = FormularSerializer
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        user_id = self.request.query_params.get('creator')
+        if user_id:
+            return qs.filter(creator_id=user_id)
+        # Allow retrieve by ID even unauthenticated
+        if self.action == 'retrieve':
+            return qs
+        if self.request.user.is_authenticated:
+            return qs.filter(creator=self.request.user)
+        return qs.none()
+    def perform_create(self, serializer):
+        serializer.save(creator=self.request.user)
+@method_decorator(csrf_exempt, name='dispatch')
 class CampFormularViewSet(viewsets.ModelViewSet):
     queryset = CampFormular.objects.all()
     serializer_class = CampFormularSerializer
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        formular_id = self.request.query_params.get('formular')
+        if formular_id:
+            return qs.filter(formular_id=formular_id)
+        if self.request.user.is_authenticated:
+            return qs.filter(formular__creator=self.request.user)
+        return qs.none()
+
+@method_decorator(csrf_exempt, name='dispatch')
 class TokenTurnatorViewSet(viewsets.ModelViewSet):
     queryset = TokenTurnator.objects.all()
     serializer_class = TokenTurnatorSerializer
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        cod = self.request.query_params.get('cod')
+        if cod:
+            return qs.filter(cod__iexact=cod)
+        formular_id = self.request.query_params.get('formular')
+        if formular_id:
+            return qs.filter(formular_id=formular_id)
+        if self.request.user.is_authenticated:
+            return qs.filter(formular__creator=self.request.user)
+        return qs.none()
+
+@method_decorator(csrf_exempt, name='dispatch')
 class RaspunsCampViewSet(viewsets.ModelViewSet):
     queryset = RaspunsCamp.objects.all()
     serializer_class = RaspunsCampSerializer
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        turnatorie_id = self.request.query_params.get('turnatorie')
+        if turnatorie_id:
+            return qs.filter(turnatorie_id=turnatorie_id)
+        if self.request.user.is_authenticated:
+            return qs.filter(turnatorie__formular__creator=self.request.user)
+        return qs.none()
+
 class TurnatorieViewSet(viewsets.ModelViewSet):
     queryset = Turnatorie.objects.all()
     serializer_class = TurnatorieSerializer
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        formular_id = self.request.query_params.get('formular')
+        if formular_id:
+            return qs.filter(formular_id=formular_id)
+        if self.request.user.is_authenticated:
+            return qs.filter(formular__creator=self.request.user)
+        return qs.none()
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+    @action(detail=True, methods=['post'], authentication_classes=[], permission_classes=[AllowAny])
+    def analyze(self, request, pk=None):
+        turnatorie = Turnatorie.objects.get(pk=pk)
+        try:
+            from agents.sentiment import analyze_turnatorie
+            analyze_turnatorie(turnatorie)
+            return JsonResponse({'ok': True})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)

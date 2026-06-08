@@ -1,5 +1,6 @@
 import json
 
+from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.shortcuts import render
 
@@ -89,6 +90,7 @@ def build_turnator_context(token_cod):
     return '\n'.join(lines)
 
 
+@csrf_exempt
 def chatbot_view(request):
     if request.method != 'POST':
         return render(request, 'agents/chatbot.html')
