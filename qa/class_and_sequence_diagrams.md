@@ -64,6 +64,7 @@ classDiagram
     Formular "1" --> "many" Turnatorie : receives
     Turnatorie "1" --> "many" RaspunsCamp : includes
     CampFormular "1" --> "many" RaspunsCamp : receives
+    Turnatorie "1" --> "0..1" TokenTurnator : validates
     Turnatorie "1" --> "0..1" SentimentResult : has
     RaspunsCamp "1" --> "0..1" SentimentRaspuns : has
 ```

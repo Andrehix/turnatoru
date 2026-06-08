@@ -109,9 +109,7 @@ def api_login(request):
 
     username = request.POST.get('username', '')
     password = request.POST.get('password', '')
-    print(f'[DEBUG api_login] username={username!r} password={password!r}', flush=True)
     user = authenticate(request, username=username, password=password)
-    print(f'[DEBUG api_login] user={user!r}', flush=True)
 
     if user is not None:
         login(request, user)

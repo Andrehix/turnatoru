@@ -128,7 +128,7 @@ Bug reports are tracked as [GitHub Issues](https://github.com/Andrehix/turnatoru
 
 ## CI/CD Pipeline
 
-File: [`.github/workflows/ci.yml`](./.github/workflows/ci.yml)
+File: [`.github/workflows/django.yml`](./.github/workflows/django.yml)
 
 - **Trigger:** every push and pull request to `main`
 - **Steps:** `ruff` linter → `pytest` test suite

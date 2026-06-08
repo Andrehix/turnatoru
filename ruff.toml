@@ -1,0 +1,9 @@
+[lint]
+ignore = [
+    "E402",  # module-level import not at top of file (Django apps need setup first)
+    "E701",  # multiple statements on one line
+    "E722",  # bare except — handled by Django's error logging
+    "F541",  # f-string without placeholders
+    "F841",  # local variable assigned but never used
+]
+exclude = ["venv", "migrations", "node_modules", "staticfiles"]

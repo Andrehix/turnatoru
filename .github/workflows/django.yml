@@ -44,6 +44,11 @@ jobs:
         python manage.py makemigrations
         python manage.py migrate
         
+    - name: Lint with ruff
+      run: |
+        pip install ruff
+        ruff check .
+
     - name: Run Tests
       run: |
         python manage.py test
