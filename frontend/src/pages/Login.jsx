@@ -52,7 +52,7 @@ export default function Login({ setIsAuth }) {
               placeholder="Enter your username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="input-base text-white"
+              className="input-base"
             />
           </div>
 
@@ -63,7 +63,7 @@ export default function Login({ setIsAuth }) {
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="input-base text-white"
+              className="input-base"
             />
           </div>
 

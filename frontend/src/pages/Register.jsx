@@ -53,7 +53,7 @@ export default function Register() {
               placeholder="Choose your username"
               value={form.username}
               onChange={(e) => setForm({...form, username: e.target.value})}
-              className="input-base text-white"
+              className="input-base"
             />
           </div>
 
@@ -64,7 +64,7 @@ export default function Register() {
               placeholder="Enter your email"
               value={form.email}
               onChange={(e) => setForm({...form, email: e.target.value})}
-              className="input-base text-white"
+              className="input-base"
             />
           </div>
 
@@ -75,7 +75,7 @@ export default function Register() {
               placeholder="Create a password"
               value={form.password}
               onChange={(e) => setForm({...form, password: e.target.value})}
-              className="input-base text-white"
+              className="input-base"
             />
           </div>
 
@@ -86,7 +86,7 @@ export default function Register() {
               placeholder="Confirm your password"
               value={form.password2}
               onChange={(e) => setForm({...form, password2: e.target.value})}
-              className="input-base text-white"
+              className="input-base"
             />
           </div>
 
