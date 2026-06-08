@@ -4,51 +4,51 @@
 
 ```mermaid
 flowchart TD
-    A[🏠 Pagina Principală] --> B{Utilizator?}
-    B -->|Creator| C[🔐 Login / Înregistrare]
-    B -->|Turnător| D[🎫 Introdu Token]
-    B -->|Vizitator| E[🤖 Chatbot AI]
+    A[🏠 Home Page] --> B{User?}
+    B -->|Creator| C[🔐 Login / Register]
+    B -->|Respondent| D[🎫 Enter Token]
+    B -->|Visitor| E[🤖 AI Chatbot]
 
     C --> F[📊 Dashboard]
-    F --> G[👥 Gestionează Persoane]
-    F --> H[📝 Creează Formular]
-    F --> I[🐀 Vezi Turnătorii]
+    F --> G[👥 Manage People]
+    F --> H[📝 Create Form]
+    F --> I[🐀 View Responses]
 
-    G --> G1[➕ Adaugă Persoană]
-    G --> G2[🗑️ Șterge Persoană]
+    G --> G1[➕ Add Person]
+    G --> G2[🗑️ Delete Person]
 
-    H --> H1[📝 Titlu + Mesaj]
-    H1 --> H2[➕ Adaugă Întrebări]
-    H2 --> H3[👤 Asociază Persoana]
-    H3 --> H4[🏷️ Alege Tip: Text / Opțiuni]
-    H4 --> H5[✅ Salvează Formular]
+    H --> H1[📝 Title + Message]
+    H1 --> H2[➕ Add Questions]
+    H2 --> H3[👤 Assign Person]
+    H3 --> H4[🏷️ Choose Type: Text / Options]
+    H4 --> H5[✅ Save Form]
 
-    I --> I1[📊 Vezi Răspunsuri + Sentiment]
-    I --> I2[🎫 Generează Tokeni]
-    I --> I3[📄 Exportă PDF]
+    I --> I1[📊 View Responses + Sentiment]
+    I --> I2[🎫 Generate Tokens]
+    I --> I3[📄 Export PDF]
 
     D --> D1{Token valid?}
-    D1 -->|Da, nefolosit| D2[📝 Completează Formular]
-    D1 -->|Deja folosit| D3[🚫 Token Expirat]
-    D3 --> D4[🎫 Vezi Tokeni Disponibili]
+    D1 -->|Yes, unused| D2[📝 Fill Form]
+    D1 -->|Already used| D3[🚫 Token Expired]
+    D3 --> D4[🎫 View Available Tokens]
 
-    D2 --> D5[✅ Trimite Feedback]
-    D5 --> D6[🤖 AI: Analiză Sentiment]
-    D6 --> D7[🎉 Succes!]
+    D2 --> D5[✅ Submit Feedback]
+    D5 --> D6[🤖 AI: Sentiment Analysis]
+    D6 --> D7[🎉 Success!]
 
-    E --> E1[💬 Întreabă Asistentul AI]
-    E1 --> E2{Utilizator logat?}
-    E2 -->|Creator| E3[Context: formulare + răspunsuri]
-    E2 -->|Turnător cu token| E4[Context: întrebări formular]
-    E2 -->|Anonim| E5[Asistență generală feedback]
-    E3 --> E6[Răspuns AI]
+    E --> E1[💬 Ask AI Assistant]
+    E1 --> E2{Logged in?}
+    E2 -->|Creator| E3[Context: forms + responses]
+    E2 -->|Respondent with token| E4[Context: form questions]
+    E2 -->|Anonymous| E5[General feedback help]
+    E3 --> E6[AI Response]
     E4 --> E6
     E5 --> E6
 ```
 
 ## Flow Description
 
-1. **Landing**: Userul alege rolul — Creator (creează formulare), Turnător (răspunde anonim), sau folosește Chatbot-ul AI
-2. **Creator Flow**: Login → Dashboard → Gestionează persoane → Creează formular cu întrebări dinamice → Generează tokeni → Analizează răspunsuri
-3. **Turnător Flow**: Introduce token → Dacă valid: completează formular anonim → AI analizează sentimentul → Succes. Dacă folosit: vede tokeni disponibili
-4. **Chatbot AI**: Oferă răspunsuri contextualizate în funcție de rolul utilizatorului
+1. **Landing**: User chooses role — Creator (creates forms), Respondent (answers anonymously), or uses the AI Chatbot
+2. **Creator Flow**: Login → Dashboard → Manage people → Create form with dynamic questions → Generate tokens → Analyze responses
+3. **Respondent Flow**: Enter token → If valid: complete anonymous form → AI analyzes sentiment → Success. If used: see available tokens
+4. **AI Chatbot**: Provides contextual responses based on user role
