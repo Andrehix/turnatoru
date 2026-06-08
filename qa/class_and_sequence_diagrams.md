@@ -44,6 +44,17 @@ classDiagram
         +valoare: TextField
     }
 
+    class SentimentResult {
+        +sentiment: CharField
+        +procent_pozitiv: IntegerField
+        +procent_neutru: IntegerField
+        +procent_negativ: IntegerField
+    }
+
+    class SentimentRaspuns {
+        +sentiment: CharField
+    }
+
     User "1" --> "many" Formular : creeaza
     User "1" --> "many" Persoana : defineste
     Formular "1" --> "many" TokenTurnator : genereaza
@@ -53,6 +64,8 @@ classDiagram
     Turnatorie "1" --> "many" RaspunsCamp : include
     CampFormular "1" --> "many" RaspunsCamp : primeste
     Turnatorie "1" --> "0..1" TokenTurnator : valideaza
+    Turnatorie "1" --> "0..1" SentimentResult : analizeaza
+    RaspunsCamp "1" --> "0..1" SentimentRaspuns : analizeaza
 ```
 
 ## Sequence Diagram

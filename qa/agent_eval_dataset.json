@@ -1,48 +1,8 @@
 {
   "project": "Turnatoru",
-  "purpose": "Evaluation dataset for anonymization and sentiment-analysis agents",
-  "anonymization_agent": {
-    "placeholder_policy": {
-      "person_name": "[NUME]",
-      "email": "[EMAIL]",
-      "phone": "[TELEFON]",
-      "company": "[COMPANIE]",
-      "location": "[LOCATIE]"
-    },
-    "cases": [
-      {
-        "id": "anon-01",
-        "input": "Maria Popescu din Bucuresti a trimis feedback pentru Andrei Ionescu la adresa maria.popescu@example.com si numarul 0722123456.",
-        "expected_output": "[NUME] din [LOCATIE] a trimis feedback pentru [NUME] la adresa [EMAIL] si numarul [TELEFON].",
-        "focus": ["names", "email", "phone", "location"]
-      },
-      {
-        "id": "anon-02",
-        "input": "Ion Vasile lucreaza la ByteForge si mentioneaza in raportul intern ca Ana Marin intarzie des.",
-        "expected_output": "[NUME] lucreaza la [COMPANIE] si mentioneaza in raportul intern ca [NUME] intarzie des.",
-        "focus": ["names", "company"]
-      },
-      {
-        "id": "anon-03",
-        "input": "Suna-l pe 0755 111 222 sau scrie-i lui Radu Stan despre proiect.",
-        "expected_output": "Suna-l pe [TELEFON] sau scrie-i lui [NUME] despre proiect.",
-        "focus": ["phone", "name"]
-      },
-      {
-        "id": "anon-04",
-        "input": "Elena Gheorghe a spus ca firma TechNova SRL are un proces slab de comunicare.",
-        "expected_output": "[NUME] a spus ca firma [COMPANIE] are un proces slab de comunicare.",
-        "focus": ["name", "company"]
-      },
-      {
-        "id": "anon-05",
-        "input": "Feedback pentru Vlad I. de la sediul din Cluj-Napoca: se prezinta bine la sedinte.",
-        "expected_output": "Feedback pentru [NUME] de la sediul din [LOCATIE]: se prezinta bine la sedinte.",
-        "focus": ["name", "location"]
-      }
-    ]
-  },
+  "purpose": "Evaluation dataset for the sentiment analysis agent",
   "sentiment_analysis_agent": {
+    "model": "claude-sonnet-4-6",
     "labels": ["pozitiv", "neutru", "negativ"],
     "cases": [
       {
@@ -74,6 +34,34 @@
         "id": "sent-06",
         "input": "Nu imi place deloc cum gestioneaza comunicarea si raspunde foarte greu.",
         "expected_label": "negativ"
+      },
+      {
+        "id": "sent-07",
+        "input": "A facut ce trebuia, nimic mai mult nimic mai putin.",
+        "expected_label": "neutru"
+      },
+      {
+        "id": "sent-08",
+        "input": "Exceptional! Depaseste mereu asteptarile si vine cu idei noi.",
+        "expected_label": "pozitiv"
+      }
+    ]
+  },
+  "chatbot_agent": {
+    "model": "claude-sonnet-4-6",
+    "description": "Context-aware assistant — receives creator forms+responses or turnator form context in system prompt",
+    "cases": [
+      {
+        "id": "chat-01",
+        "context": "anonymous visitor",
+        "input": "Salut!",
+        "expected": "response contains greeting and mentions feedback assistance"
+      },
+      {
+        "id": "chat-02",
+        "context": "no api key",
+        "input": "Ajutor",
+        "expected": "fallback message contains 'disponibil'"
       }
     ]
   }
