@@ -166,8 +166,8 @@ Used GitHub Copilot and Gemini for QA setup and testing:
 - Assisted with CI/CD workflow configuration
 - Used Gemini for agent evaluation dataset design
 
-### Prodan Adrian-Andrei — Gemini (Browser) + VS Code Copilot (Gemini 3.1 Pro)
-Used Gemini in the browser to consult on project structure and core ideas, then VS Code Copilot with Gemini 3.1 Pro for the actual coding:
+### Prodan Adrian-Andrei — Gemini (Browser) + VS Code Copilot (Gemini 3.1 Pro + DeepSeek V4 Pro)
+Used Gemini in the browser to consult on project structure and core ideas, then VS Code Copilot with Gemini 3.1 Pro and DeepSeek V4 Pro for the actual coding:
 - Planned the overall platform architecture (Django + DRF + React)
 - Designed the data models (`Formular`, `TokenTurnator`, `Turnatorie`, `Persoana`, `CampFormular`, `RaspunsCamp`)
 - Implemented the dynamic form builder with per-person question assignment
